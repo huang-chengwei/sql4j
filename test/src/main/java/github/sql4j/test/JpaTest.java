@@ -12,6 +12,7 @@ import github.sql4j.jpa.JpaQueryBuilder;
 import github.sql4j.test.entity.User;
 import github.sql4j.test.projection.UserInterface;
 import github.sql4j.test.projection.UserModel;
+import jakarta.persistence.EntityManager;
 import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -20,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -109,7 +109,8 @@ public class JpaTest {
             User parentUser = user.getParentUser();
             assertNotNull(parentUser);
             assertEquals(user.getPid(), parentUser.getId());
-            assertEquals(parentUser, userQuery.where(User::getId).eq(parentUser.getId()).getSingle());
+            User single = userQuery.where(User::getId).eq(parentUser.getId()).getSingle();
+            assertEquals(single, parentUser);
         }
 
     }

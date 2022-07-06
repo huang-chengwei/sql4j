@@ -1,18 +1,19 @@
 package github.sql4j.test.entity;
 
 import github.sql4j.dsl.expression.path.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.util.Date;
 import java.util.Objects;
 
-@javax.persistence.Entity
+@SuppressWarnings("JpaDataSourceORMInspection")
+@jakarta.persistence.Entity
 @ToString
 @Getter
 @Setter
@@ -40,7 +41,9 @@ public class User implements Entity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof User)) {
+            return false;
+        }
 
         User user = (User) o;
 
@@ -48,7 +51,7 @@ public class User implements Entity {
         if (valid != user.valid) return false;
         if (!Objects.equals(username, user.username)) return false;
         // if (!Objects.equals(time, user.time)) return false;
-        return Objects.equals(pid, user.pid);
+        return toString().equals(o.toString());
     }
 
     @Override

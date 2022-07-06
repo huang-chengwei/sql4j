@@ -1,6 +1,6 @@
 package github.sql4j.dsl.support.meta;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 
@@ -65,7 +65,7 @@ public class Attribute {
     }
 
     public void setValue(Object entity, Object value) {
-        boolean accessible = field.isAccessible();
+        boolean accessible = field.canAccess(entity);
         try {
             if (setter != null) {
                 setter.invoke(entity, value);
@@ -83,7 +83,7 @@ public class Attribute {
     }
 
     public Object getValue(Object entity) {
-        boolean accessible = field.isAccessible();
+        boolean accessible = field.canAccess(entity);
         try {
             Object result;
             if (getter != null) {

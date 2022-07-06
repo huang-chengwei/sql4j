@@ -7,9 +7,9 @@ import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.builder.component.Order;
 import github.sql4j.dsl.util.Array;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

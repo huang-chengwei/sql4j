@@ -3,7 +3,7 @@ package github.sql4j.jpa;
 import github.sql4j.dsl.builder.ResultBuilder;
 import github.sql4j.dsl.support.StructuredQuery;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 public class JpaEntityResultBuilder<T> extends JpaResultQuery<T> implements ResultBuilder<T> {

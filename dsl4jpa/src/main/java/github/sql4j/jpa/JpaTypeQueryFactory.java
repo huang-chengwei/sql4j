@@ -4,7 +4,7 @@ import github.sql4j.dsl.builder.ResultBuilder;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.TypeQueryFactory;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 public class JpaTypeQueryFactory implements TypeQueryFactory {
 
