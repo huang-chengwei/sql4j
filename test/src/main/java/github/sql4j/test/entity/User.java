@@ -47,19 +47,23 @@ public class User implements Entity {
 
         User user = (User) o;
 
-        if (randomNumber != user.randomNumber) return false;
-        if (valid != user.valid) return false;
-        if (!Objects.equals(username, user.username)) return false;
+        if (getRandomNumber() != user.getRandomNumber()) return false;
+        if (isValid() != user.isValid()) return false;
+        if (!Objects.equals(getUsername(), user.getUsername())) return false;
         // if (!Objects.equals(time, user.time)) return false;
-        return toString().equals(o.toString());
+        return Objects.equals(getPid(), user.getPid());
     }
 
     @Override
     public int hashCode() {
-        int result = randomNumber;
+        int result = getRandomNumber();
+        String username = getUsername();
         result = 31 * result + (username != null ? username.hashCode() : 0);
+        Date time = getTime();
         result = 31 * result + (time != null ? time.hashCode() : 0);
+        Integer pid = getPid();
         result = 31 * result + (pid != null ? pid.hashCode() : 0);
+        boolean valid = isValid();
         result = 31 * result + (valid ? 1 : 0);
         return result;
     }
