@@ -22,8 +22,8 @@ public class WhereBuilderImpl<T> extends AbstractResult<T> implements WhereBuild
 
     @Delegate
     @Override
-    protected @NotNull Fetch<T, FetchBuilder<T>> getFetchable() {
-        return super.getFetchable();
+    protected @NotNull Fetch<T, FetchBuilder<T>> getFetch() {
+        return super.getFetch();
     }
 
     @Delegate
@@ -34,8 +34,8 @@ public class WhereBuilderImpl<T> extends AbstractResult<T> implements WhereBuild
 
     @Delegate
     @Override
-    protected @NotNull GroupBy<T, GroupByBuilder<T>> getGroupable() {
-        return super.getGroupable();
+    protected @NotNull GroupBy<T, GroupByBuilder<T>> getGroupBy() {
+        return super.getGroupBy();
     }
 
     @Delegate

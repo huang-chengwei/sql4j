@@ -24,8 +24,8 @@ public class FetchBuilderImpl<T> extends AbstractResult<T> implements FetchBuild
 
     @Delegate
     @Override
-    protected @NotNull Fetch<T, FetchBuilder<T>> getFetchable() {
-        return super.getFetchable();
+    protected @NotNull Fetch<T, FetchBuilder<T>> getFetch() {
+        return super.getFetch();
     }
 
     @Delegate

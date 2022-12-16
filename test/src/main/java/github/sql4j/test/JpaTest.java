@@ -1,5 +1,6 @@
 package github.sql4j.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import github.sql4j.dsl.QueryBuilder;
 import github.sql4j.dsl.builder.Query;
 import github.sql4j.dsl.builder.WhereBuilder;
@@ -7,6 +8,7 @@ import github.sql4j.dsl.expression.Predicate;
 import github.sql4j.dsl.expression.path.attribute.Attribute;
 import github.sql4j.dsl.expression.path.attribute.ComparableAttribute;
 import github.sql4j.dsl.expression.path.attribute.EntityAttribute;
+import github.sql4j.dsl.support.JsonSerializablePredicate;
 import github.sql4j.dsl.support.builder.component.AggregateFunction;
 import github.sql4j.jpa.JpaQueryBuilder;
 import github.sql4j.test.entity.User;
@@ -296,6 +298,59 @@ public class JpaTest {
                 .collect(Collectors.toList());
         assertEquals(qList, fList);
 
+    }
+
+    private JsonSerializablePredicate exchange(JsonSerializablePredicate expression) {
+        try {
+            String s = JsonSerializablePredicateValueTest.mapper.writeValueAsString(expression);
+            return JsonSerializablePredicateValueTest.mapper.readValue(s, JsonSerializablePredicate.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testJsonSerializableWhereExpression() {
+        Predicate<User> predicate = Predicate
+                .get(User::getRandomNumber).ge(10)
+                .or(User::getRandomNumber).lt(5)
+                .not();
+
+        check(predicate);
+
+        predicate = Predicate
+                .get(User::getUsername).eq("Jeremy Keynes")
+                .not();
+
+        check(predicate);
+
+
+        predicate = Predicate
+                .get((ComparableAttribute<User, String>) User::getUsername).eq("Jeremy Keynes")
+                .not();
+        check(predicate);
+
+
+        predicate = Predicate
+                .get((Attribute<User, String>) User::getUsername).eq("Jeremy Keynes");
+        check(predicate);
+
+
+        predicate = predicate
+                .and(Predicate.get(User::getId).eq(3))
+                .not();
+        check(predicate);
+
+
+    }
+
+    private void check(Predicate<User> predicate) {
+        List<User> qList = userQuery.where(predicate).getList();
+        JsonSerializablePredicate expression = new JsonSerializablePredicate(predicate);
+        List<User> fList = userQuery.where(expression.toPredicate()).getList();
+        assertEquals(qList, fList);
+        fList = userQuery.where(exchange(expression).toPredicate()).getList();
+        assertEquals(qList, fList);
     }
 
     @Test
@@ -606,12 +661,12 @@ public class JpaTest {
 
         qList = userQuery.where(Predicate
                         .get(User::getRandomNumber).ge(10)
-                        .andNot((ComparableAttribute<User, Integer>) User::getRandomNumber).lt(5)
+                        .andNot((ComparableAttribute<User, Integer>) User::getRandomNumber).gt(15)
                         .not()
                 )
                 .getList();
         fList = allUsers.stream()
-                .filter(it -> !(it.getRandomNumber() >= 10 && it.getRandomNumber() >= 5))
+                .filter(it -> !(it.getRandomNumber() >= 10 && it.getRandomNumber() <= 15))
                 .collect(Collectors.toList());
 
 
@@ -946,7 +1001,7 @@ public class JpaTest {
     }
 
     @Test
-    public void testWhereable() {
+    public void testWhere() {
         List<User> resultList = userQuery
                 .where(User::getParentUser).map(User::getUsername).eq(username)
                 .getList();

@@ -34,7 +34,7 @@ public class PathExpression<T> implements SqlExpression<T>, Iterable<String> {
     @Override
     @NotNull
     public Iterator<String> iterator() {
-        return new Iterator<String>() {
+        return new Iterator<>() {
             int index = 0;
 
             @Override
@@ -158,6 +158,12 @@ public class PathExpression<T> implements SqlExpression<T>, Iterable<String> {
 
     public List<? extends SqlExpression<?>> getExpressions() {
         throw new UnsupportedOperationException();
+    }
+
+    public String[] toArray() {
+        String[] array = new String[length];
+        System.arraycopy(path, 0, array, 0, array.length);
+        return array;
     }
 
 }

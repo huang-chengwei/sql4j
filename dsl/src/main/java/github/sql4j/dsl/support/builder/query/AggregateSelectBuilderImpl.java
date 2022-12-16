@@ -20,14 +20,14 @@ public class AggregateSelectBuilderImpl<T> extends AbstractResult<T> implements 
 
     @Delegate
     @Override
-    protected @NotNull Where<T, SelectBuilder<T>> getObjectsWhereable() {
-        return super.getObjectsWhereable();
+    protected @NotNull Where<T, SelectBuilder<T>> getObjectsWhere() {
+        return super.getObjectsWhere();
     }
 
     @Delegate
     @Override
-    protected @NotNull GroupBy<T, GroupByBuilder<T>> getGroupable() {
-        return super.getGroupable();
+    protected @NotNull GroupBy<T, GroupByBuilder<T>> getGroupBy() {
+        return super.getGroupBy();
     }
 
     @Delegate
