@@ -56,34 +56,61 @@ public class JsonSerializablePredicate {
     }
 
     private SqlExpression<?> toSqlExpression() {
-        return new SqlExpression<>() {
-            @Override
-            public PathExpression<Object> asPathExpression() {
-                return new PathExpression<>(pathExpression);
-            }
+        List<SqlExpression<?>> expressions = this.expressions == null ? null : Arrays.stream(this.expressions)
+                .map(JsonSerializablePredicate::toSqlExpression)
+                .collect(Collectors.toList());
+        PathExpression<Object> path = pathExpression == null ? null : new PathExpression<>(pathExpression);
+        Object value = this.value == null ? null : this.value.value;
+        return new SqlExpressionImpl<>(path,
+                type,
+                value,
+                operator,
+                expressions);
+    }
 
-            @Override
-            public Type getType() {
-                return type;
-            }
+    private static class SqlExpressionImpl<T> implements SqlExpression<T> {
+        final PathExpression<T> pathExpression;
+        final Type type;
+        final T value;
+        final Operator operator;
+        final List<SqlExpression<?>> expressions;
 
-            @Override
-            public Object getValue() {
-                return value.value();
-            }
+        private SqlExpressionImpl(PathExpression<T> pathExpression,
+                                  Type type,
+                                  T value,
+                                  Operator operator,
+                                  List<SqlExpression<?>> expressions) {
+            this.pathExpression = pathExpression;
+            this.type = type;
+            this.value = value;
+            this.operator = operator;
+            this.expressions = expressions;
+        }
 
-            @Override
-            public Operator getOperator() {
-                return operator;
-            }
+        @Override
+        public PathExpression<T> asPathExpression() {
+            return pathExpression;
+        }
 
-            @Override
-            public List<? extends SqlExpression<?>> getExpressions() {
-                return expressions == null ? null : Arrays.stream(expressions)
-                        .map(JsonSerializablePredicate::toSqlExpression)
-                        .collect(Collectors.toList());
-            }
-        };
+        @Override
+        public Type getType() {
+            return type;
+        }
+
+        @Override
+        public T getValue() {
+            return value;
+        }
+
+        @Override
+        public Operator getOperator() {
+            return operator;
+        }
+
+        @Override
+        public List<? extends SqlExpression<?>> getExpressions() {
+            return expressions;
+        }
     }
 
     public static class Value {

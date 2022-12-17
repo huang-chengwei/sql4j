@@ -2,7 +2,6 @@ package jdbc.mysql;
 
 
 import github.sql4j.dsl.expression.Operator;
-import github.sql4j.dsl.expression.OperatorExpression;
 import github.sql4j.dsl.expression.PathExpression;
 import github.sql4j.dsl.expression.SqlExpression;
 import github.sql4j.dsl.support.StructuredQuery;
@@ -459,7 +458,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         Operator getOperator(SqlExpression<?> e) {
-            if (e instanceof OperatorExpression) {
+            if (e.getType() == SqlExpression.Type.OPERATOR) {
                 return e.getOperator();
             }
             return null;

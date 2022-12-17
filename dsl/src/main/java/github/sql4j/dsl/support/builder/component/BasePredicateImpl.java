@@ -17,5 +17,8 @@ public class BasePredicateImpl<T, U, BUILDER>
         super(expression, combined, negate, mapper);
     }
 
-
+    @Override
+    public BasePredicate<T, U, BUILDER> not() {
+        return new BasePredicateImpl<>(expression, combined, !negate, mapper);
+    }
 }

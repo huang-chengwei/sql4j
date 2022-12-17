@@ -73,4 +73,6 @@ public interface ComparablePredicate<T, U extends Comparable<?>, BUILDER>
      */
     BUILDER lt(ComparableAttribute<T, U> value);
 
+    ComparablePredicate<T, U, BUILDER> not();
+
 }

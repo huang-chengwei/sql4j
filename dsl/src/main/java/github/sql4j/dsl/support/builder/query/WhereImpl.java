@@ -14,9 +14,16 @@ import java.util.function.Function;
 public class WhereImpl<T, BUILDER> implements Where<T, BUILDER> {
 
     private final Function<SqlExpression<Boolean>, BUILDER> mapper;
+    private final boolean negate;
 
     public WhereImpl(Function<SqlExpression<Boolean>, BUILDER> mapper) {
         this.mapper = mapper;
+        negate = false;
+    }
+
+    public WhereImpl(Function<SqlExpression<Boolean>, BUILDER> mapper, boolean negate) {
+        this.mapper = mapper;
+        this.negate = negate;
     }
 
     @NotNull
@@ -27,58 +34,38 @@ public class WhereImpl<T, BUILDER> implements Where<T, BUILDER> {
 
     @Override
     public <U extends Entity> PathBuilder<T, U, BUILDER> where(EntityAttribute<T, U> attribute) {
-        return getBuilder().and(attribute);
+        return negate ? getBuilder().andNot(attribute) : getBuilder().and(attribute);
     }
 
     @Override
     public <U> BasePredicate<T, U, BUILDER> where(Attribute<T, U> attribute) {
-        return getBuilder().and(attribute);
+        return negate ? getBuilder().andNot(attribute) :  getBuilder().and(attribute);
     }
 
     @Override
     public <U extends Number & Comparable<?>> NumberPredicate<T, U, BUILDER>
     where(NumberAttribute<T, U> attribute) {
-        return getBuilder().and(attribute);
+        return negate ? getBuilder().andNot(attribute) : getBuilder().and(attribute);
     }
 
     @Override
     public <U extends Comparable<?>> ComparablePredicate<T, U, BUILDER>
     where(ComparableAttribute<T, U> attribute) {
-        return getBuilder().and(attribute);
+        return negate ? getBuilder().andNot(attribute) : getBuilder().and(attribute);
     }
 
     @Override
     public StringPredicate<T, BUILDER> where(StringAttribute<T> attribute) {
-        return getBuilder().and(attribute);
-    }
-
-    @Override
-    public <U extends Entity> PathBuilder<T, U, BUILDER> whereNot(EntityAttribute<T, U> attribute) {
-        return getBuilder().andNot(attribute);
-    }
-
-    @Override
-    public <U> BasePredicate<T, U, BUILDER> whereNot(Attribute<T, U> attribute) {
-        return getBuilder().andNot(attribute);
-    }
-
-    @Override
-    public <U extends Number & Comparable<?>> NumberPredicate<T, U, BUILDER> whereNot(NumberAttribute<T, U> attribute) {
-        return getBuilder().andNot(attribute);
-    }
-
-    @Override
-    public <U extends Comparable<?>> ComparablePredicate<T, U, BUILDER> whereNot(ComparableAttribute<T, U> attribute) {
-        return getBuilder().andNot(attribute);
-    }
-
-    @Override
-    public StringPredicate<T, BUILDER> whereNot(StringAttribute<T> attribute) {
-        return getBuilder().andNot(attribute);
+        return negate ? getBuilder().andNot(attribute) : getBuilder().and(attribute);
     }
 
     @Override
     public BUILDER where(Predicate<T> predicate) {
         return getBuilder().and(predicate);
+    }
+
+    @Override
+    public Where<T, BUILDER> not() {
+        return new WhereImpl<>(mapper, !negate);
     }
 }

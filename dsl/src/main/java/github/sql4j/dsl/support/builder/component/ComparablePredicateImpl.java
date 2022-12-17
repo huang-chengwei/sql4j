@@ -50,4 +50,9 @@ public class ComparablePredicateImpl<T, U extends Comparable<?>, BUILDER>
         return super.lt(exchange);
     }
 
+    @Override
+    public ComparablePredicate<T, U, BUILDER> not() {
+        return new ComparablePredicateImpl<>(expression, combined, !negate, mapper);
+    }
+
 }

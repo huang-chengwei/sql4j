@@ -57,14 +57,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new BasePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public <R> BasePredicate<T, R, BUILDER> andNot(Attribute<T, R> attribute) {
         return new BasePredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public <R> BasePredicate<T, R, BUILDER> orNot(Attribute<T, R> attribute) {
-        return new BasePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -77,14 +71,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new NumberPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public <R extends Number & Comparable<?>> NumberPredicate<T, R, BUILDER> andNot(NumberAttribute<T, R> attribute) {
         return new NumberPredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public <R extends Number & Comparable<?>> NumberPredicate<T, R, BUILDER> orNot(NumberAttribute<T, R> attribute) {
-        return new NumberPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -97,14 +85,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new ComparablePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public <R extends Comparable<?>> ComparablePredicate<T, R, BUILDER> andNot(ComparableAttribute<T, R> attribute) {
         return new ComparablePredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public <R extends Comparable<?>> ComparablePredicate<T, R, BUILDER> orNot(ComparableAttribute<T, R> attribute) {
-        return new ComparablePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -117,14 +99,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new StringPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public StringPredicate<T, BUILDER> andNot(StringAttribute<T> attribute) {
         return new StringPredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public StringPredicate<T, BUILDER> orNot(StringAttribute<T> attribute) {
-        return new StringPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override

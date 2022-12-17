@@ -28,5 +28,6 @@ public interface BasePredicate<T, U, BUILDER> {
 
     BasePredicate<T, U, BUILDER> ifNull(U value);
 
+    BasePredicate<T, U, BUILDER> not();
 
 }
