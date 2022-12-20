@@ -2,7 +2,7 @@ package github.sql4j.dsl.support.builder.criteria;
 
 import github.sql4j.dsl.builder.SortAction;
 import github.sql4j.dsl.builder.Sort;
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.path.AttributePath;
 import github.sql4j.dsl.expression.path.attribute.Attribute;
 import github.sql4j.dsl.expression.path.attribute.ComparableAttribute;
@@ -51,11 +51,11 @@ public class SortImpl<T, BUILDER> implements Sort<T, BUILDER> {
 
     public static class SortActionImpl<T> implements SortAction<T> {
 
-        private final SqlExpression<?> expression;
-        private final BiFunction<SqlExpression<?>, Boolean, T> mapper;
+        private final Expression<?> expression;
+        private final BiFunction<Expression<?>, Boolean, T> mapper;
 
-        public SortActionImpl(SqlExpression<?> expression,
-                              BiFunction<SqlExpression<?>, Boolean, T> mapper) {
+        public SortActionImpl(Expression<?> expression,
+                              BiFunction<Expression<?>, Boolean, T> mapper) {
             this.expression = expression;
             this.mapper = mapper;
         }

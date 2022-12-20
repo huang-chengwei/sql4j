@@ -1,5 +1,6 @@
 package github.sql4j.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import github.sql4j.dsl.QueryBuilder;
 import github.sql4j.dsl.builder.Query;
 import github.sql4j.dsl.builder.WhereBuilder;
@@ -7,11 +8,13 @@ import github.sql4j.dsl.expression.Predicate;
 import github.sql4j.dsl.expression.path.attribute.Attribute;
 import github.sql4j.dsl.expression.path.attribute.ComparableAttribute;
 import github.sql4j.dsl.expression.path.attribute.EntityAttribute;
+import github.sql4j.dsl.support.JsonSerializablePredicate;
 import github.sql4j.dsl.support.builder.component.AggregateFunction;
 import github.sql4j.jpa.JpaQueryBuilder;
 import github.sql4j.test.entity.User;
 import github.sql4j.test.projection.UserInterface;
 import github.sql4j.test.projection.UserModel;
+import javax.persistence.EntityManager;
 import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -20,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -109,7 +111,8 @@ public class JpaTest {
             User parentUser = user.getParentUser();
             assertNotNull(parentUser);
             assertEquals(user.getPid(), parentUser.getId());
-            assertEquals(parentUser, userQuery.where(User::getId).eq(parentUser.getId()).getSingle());
+            User single = userQuery.where(User::getId).eq(parentUser.getId()).getSingle();
+            assertEquals(single, parentUser);
         }
 
     }
@@ -241,7 +244,7 @@ public class JpaTest {
     @Test
     public void testPredicate() {
         List<User> qList = userQuery.where(Predicate
-                        .get(User::getRandomNumber).ge(10)
+                        .of(User::getRandomNumber).ge(10)
                         .or(User::getRandomNumber).lt(5)
                         .not()
                 )
@@ -254,7 +257,7 @@ public class JpaTest {
         assertEquals(qList, fList);
 
         qList = userQuery.where(Predicate
-                        .get(User::getUsername).eq("Jeremy Keynes")
+                        .of(User::getUsername).eq("Jeremy Keynes")
                         .not()
                 )
                 .getList();
@@ -264,7 +267,7 @@ public class JpaTest {
         assertEquals(qList, fList);
 
         qList = userQuery.where(Predicate
-                        .get((ComparableAttribute<User, String>) User::getUsername).eq("Jeremy Keynes")
+                        .of((ComparableAttribute<User, String>) User::getUsername).eq("Jeremy Keynes")
                         .not()
                 )
                 .getList();
@@ -272,9 +275,9 @@ public class JpaTest {
 
 
         Predicate<User> jeremy_keynes = Predicate
-                .get((Attribute<User, String>) User::getUsername).eq("Jeremy Keynes");
+                .of((Attribute<User, String>) User::getUsername).eq("Jeremy Keynes");
         qList = userQuery.where(jeremy_keynes
-                        .or(Predicate.get(User::getId).eq(3))
+                        .or(Predicate.of(User::getId).eq(3))
                         .not()
                 )
                 .getList();
@@ -285,7 +288,7 @@ public class JpaTest {
         assertEquals(qList, fList);
 
         qList = userQuery.where(jeremy_keynes
-                        .and(Predicate.get(User::getId).eq(3))
+                        .and(Predicate.of(User::getId).eq(3))
                         .not()
                 )
                 .getList();
@@ -297,10 +300,64 @@ public class JpaTest {
 
     }
 
+    private JsonSerializablePredicate exchange(JsonSerializablePredicate expression) {
+        try {
+            String s = JsonSerializablePredicateValueTest.mapper.writeValueAsString(expression);
+            return JsonSerializablePredicateValueTest.mapper.readValue(s, JsonSerializablePredicate.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testJsonSerializableWhereExpression() {
+        Predicate<User> predicate = Predicate
+                .of(User::getRandomNumber).ge(10)
+                .or(User::getRandomNumber).lt(5)
+                .not();
+
+        check(predicate);
+
+        predicate = Predicate
+                .of(User::getUsername).eq("Jeremy Keynes")
+                .not();
+
+        check(predicate);
+
+
+        predicate = Predicate
+                .of((ComparableAttribute<User, String>) User::getUsername).eq("Jeremy Keynes")
+                .not();
+        check(predicate);
+
+
+        predicate = Predicate
+                .of((Attribute<User, String>) User::getUsername).eq("Jeremy Keynes");
+        check(predicate);
+
+
+        predicate = predicate
+                .and(Predicate.of(User::getId).eq(3))
+                .not();
+        check(predicate);
+
+
+    }
+
+    private void check(Predicate<User> predicate) {
+        List<User> qList = userQuery.where(predicate).getList();
+        JsonSerializablePredicate expression = new JsonSerializablePredicate(predicate);
+        Predicate<User> predicate1 = expression.toPredicate();
+        List<User> fList = userQuery.where(predicate1).getList();
+        assertEquals(qList, fList);
+        fList = userQuery.where(exchange(expression).toPredicate()).getList();
+        assertEquals(qList, fList);
+    }
+
     @Test
     public void testIsNull() {
 
-        List<User> qList = userQuery.whereNot(User::getPid).isNull()
+        List<User> qList = userQuery.where(User::getPid).not().isNull()
                 .getList();
 
         List<User> fList = allUsers.stream()
@@ -321,7 +378,7 @@ public class JpaTest {
     @Test
     public void testOperator() {
 
-        WhereBuilder<User> isValid = userQuery.where(Predicate.get(User::isValid));
+        WhereBuilder<User> isValid = userQuery.where(Predicate.of(User::isValid));
         List<User> qList = isValid.getList();
         List<User> validUsers = allUsers.stream().filter(User::isValid)
                 .collect(Collectors.toList());
@@ -485,7 +542,7 @@ public class JpaTest {
 
 
         qList = userQuery.where(User::isValid).eq(true)
-                .andNot(getUsername).eq(10)
+                .and(getUsername).not().eq(10)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.isValid()
@@ -495,7 +552,7 @@ public class JpaTest {
         assertEquals(qList, fList);
 
         qList = userQuery.where(User::isValid).eq(true)
-                .orNot(getUsername).eq(10)
+                .or(getUsername).not().eq(10)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.isValid()
@@ -530,7 +587,7 @@ public class JpaTest {
 
 
         qList = userQuery.where(User::isValid).eq(true)
-                .andNot(User::getRandomNumber).eq(5)
+                .and(User::getRandomNumber).not().eq(5)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.isValid()
@@ -540,7 +597,7 @@ public class JpaTest {
         assertEquals(qList, fList);
 
         qList = userQuery.where(User::isValid).eq(true)
-                .orNot(User::getRandomNumber).ne(5)
+                .or(User::getRandomNumber).not().ne(5)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.isValid()
@@ -549,8 +606,9 @@ public class JpaTest {
 
         assertEquals(qList, fList);
 
-        qList = userQuery.whereNot(User::getRandomNumber).eq(6)
-                .orNot(User::isValid).ne(false)
+        qList = userQuery.where(User::getRandomNumber)
+                .not().eq(6)
+                .or(User::isValid).not().ne(false)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getRandomNumber() != 6
@@ -559,7 +617,7 @@ public class JpaTest {
 
         assertEquals((qList), (fList));
 
-        qList = userQuery.whereNot(User::getRandomNumber).eq(6)
+        qList = userQuery.where(User::getRandomNumber).not().eq(6)
                 .and(User::getParentUser).map(User::isValid).eq(true)
                 .getList();
         fList = allUsers.stream()
@@ -569,8 +627,8 @@ public class JpaTest {
 
         assertEquals((qList), (fList));
 
-        qList = userQuery.whereNot(User::getRandomNumber).eq(6)
-                .andNot(User::getParentUser).map(User::isValid).eq(true)
+        qList = userQuery.where(User::getRandomNumber).not().eq(6)
+                .and(User::getParentUser).map(User::isValid).not().eq(true)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getRandomNumber() != 6
@@ -579,8 +637,8 @@ public class JpaTest {
 
         assertEquals((qList), (fList));
 
-        qList = userQuery.whereNot(User::getRandomNumber).eq(6)
-                .orNot(User::getParentUser).map(User::isValid).eq(true)
+        qList = userQuery.where(User::getRandomNumber).not().eq(6)
+                .or(User::getParentUser).map(User::isValid).not().eq(true)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getRandomNumber() != 6
@@ -591,7 +649,7 @@ public class JpaTest {
 
 
         qList = userQuery.where(Predicate
-                        .get(User::getRandomNumber).ge(10)
+                        .of(User::getRandomNumber).ge(10)
                         .or((ComparableAttribute<User, Integer>) User::getRandomNumber).lt(5)
                         .not()
                 )
@@ -604,20 +662,20 @@ public class JpaTest {
         assertEquals(qList, fList);
 
         qList = userQuery.where(Predicate
-                        .get(User::getRandomNumber).ge(10)
-                        .andNot((ComparableAttribute<User, Integer>) User::getRandomNumber).lt(5)
+                        .of(User::getRandomNumber).ge(10)
+                        .and((ComparableAttribute<User, Integer>) User::getRandomNumber).not().gt(15)
                         .not()
                 )
                 .getList();
         fList = allUsers.stream()
-                .filter(it -> !(it.getRandomNumber() >= 10 && it.getRandomNumber() >= 5))
+                .filter(it -> !(it.getRandomNumber() >= 10 && it.getRandomNumber() <= 15))
                 .collect(Collectors.toList());
 
 
         assertEquals(qList, fList);
 
         qList = userQuery.where(Predicate
-                        .get(User::getRandomNumber).ge(10)
+                        .of(User::getRandomNumber).ge(10)
                         .and(User::getUsername).eq(username)
                         .not()
                 )
@@ -629,7 +687,7 @@ public class JpaTest {
 
 
         qList = userQuery.where(Predicate
-                        .get(User::getRandomNumber).ge(10)
+                        .of(User::getRandomNumber).ge(10)
                         .or(User::getUsername).eq(username)
                         .not()
                 )
@@ -641,8 +699,8 @@ public class JpaTest {
 
 
         qList = userQuery.where(Predicate
-                        .get(User::getRandomNumber).ge(10)
-                        .andNot(User::getUsername).eq(username)
+                        .of(User::getRandomNumber).ge(10)
+                        .and(User::getUsername).not().eq(username)
                         .not()
                 )
                 .getList();
@@ -652,8 +710,8 @@ public class JpaTest {
         assertEquals(qList, fList);
 
         qList = userQuery.where(Predicate
-                        .get(User::getRandomNumber).ge(10)
-                        .orNot(User::getUsername).eq(username)
+                        .of(User::getRandomNumber).ge(10)
+                        .or(User::getUsername).not().eq(username)
                         .not()
                 )
                 .getList();
@@ -710,7 +768,7 @@ public class JpaTest {
                 .where(User::getRandomNumber).mod(2).ge(1)
                 .getList();
         fList = allUsers.stream()
-                .filter(user -> user.getRandomNumber() % 2 >= 1)
+                .filter(user -> user.getRandomNumber() % 2 == 1)
                 .collect(Collectors.toList());
 
         assertEquals(list, fList);
@@ -945,7 +1003,7 @@ public class JpaTest {
     }
 
     @Test
-    public void testWhereable() {
+    public void testWhere() {
         List<User> resultList = userQuery
                 .where(User::getParentUser).map(User::getUsername).eq(username)
                 .getList();
@@ -955,7 +1013,7 @@ public class JpaTest {
         assertEquals(resultList, fList);
 
         resultList = userQuery
-                .whereNot(User::getParentUser).map(User::getUsername).eq(username)
+                .where(User::getParentUser).map(User::getUsername).not().eq(username)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getParentUser() != null && !username.equals(user.getParentUser().getUsername()))
@@ -964,7 +1022,7 @@ public class JpaTest {
 
 
         resultList = userQuery
-                .whereNot((Attribute<User, String>) User::getUsername).eq(username)
+                .where((Attribute<User, String>) User::getUsername).not().eq(username)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> !username.equals(user.getUsername()))
@@ -973,7 +1031,7 @@ public class JpaTest {
 
 
         resultList = userQuery
-                .whereNot((ComparableAttribute<User, String>) User::getUsername).eq(username)
+                .where((ComparableAttribute<User, String>) User::getUsername).not().eq(username)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> !username.equals(user.getUsername()))
@@ -982,7 +1040,7 @@ public class JpaTest {
 
 
         resultList = userQuery
-                .whereNot(User::getUsername).eq(username)
+                .where(User::getUsername).not().eq(username)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> !username.equals(user.getUsername()))

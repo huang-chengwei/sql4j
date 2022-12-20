@@ -1,6 +1,6 @@
 package github.sql4j.dsl.support.builder.query;
 
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.PathExpression;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.builder.component.Order;
@@ -11,16 +11,16 @@ public class CriteriaQueryImpl implements StructuredQuery {
     public static final CriteriaQueryImpl EMPTY = new CriteriaQueryImpl(null, null, null, null, null);
 
 
-    private final SqlExpression<Boolean> restriction;
+    private final Expression<Boolean> restriction;
     private final Array<Order> orderList;
-    private final Array<SqlExpression<?>> groupList;
-    private final Array<SqlExpression<?>> selection;
+    private final Array<Expression<?>> groupList;
+    private final Array<Expression<?>> selection;
     private final Array<PathExpression<?>> fetch;
 
-    public CriteriaQueryImpl(SqlExpression<Boolean> restriction,
+    public CriteriaQueryImpl(Expression<Boolean> restriction,
                              Array<Order> orderList,
-                             Array<SqlExpression<?>> groupList,
-                             Array<SqlExpression<?>> selection,
+                             Array<Expression<?>> groupList,
+                             Array<Expression<?>> selection,
                              Array<PathExpression<?>> fetch) {
         this.restriction = restriction;
         this.orderList = orderList;
@@ -44,7 +44,7 @@ public class CriteriaQueryImpl implements StructuredQuery {
         );
     }
 
-    public CriteriaQueryImpl updateRestriction(SqlExpression<Boolean> restriction) {
+    public CriteriaQueryImpl updateRestriction(Expression<Boolean> restriction) {
         return new CriteriaQueryImpl(restriction, orderList, groupList, selection, fetch);
     }
 
@@ -52,11 +52,11 @@ public class CriteriaQueryImpl implements StructuredQuery {
         return new CriteriaQueryImpl(restriction, orderList, groupList, selection, fetch);
     }
 
-    public CriteriaQueryImpl updateGroupList(Array<SqlExpression<?>> groupList) {
+    public CriteriaQueryImpl updateGroupList(Array<Expression<?>> groupList) {
         return new CriteriaQueryImpl(restriction, orderList, groupList, selection, fetch);
     }
 
-    public CriteriaQueryImpl updateSelection(Array<SqlExpression<?>> selection) {
+    public CriteriaQueryImpl updateSelection(Array<Expression<?>> selection) {
         return new CriteriaQueryImpl(restriction, orderList, groupList, selection, fetch);
     }
 
@@ -65,7 +65,7 @@ public class CriteriaQueryImpl implements StructuredQuery {
     }
 
     @Override
-    public SqlExpression<Boolean> where() {
+    public Expression<Boolean> where() {
         return restriction;
     }
 
@@ -75,12 +75,12 @@ public class CriteriaQueryImpl implements StructuredQuery {
     }
 
     @Override
-    public Array<SqlExpression<?>> groupBy() {
+    public Array<Expression<?>> groupBy() {
         return groupList;
     }
 
     @Override
-    public Array<SqlExpression<?>> select() {
+    public Array<Expression<?>> select() {
         return selection;
     }
 

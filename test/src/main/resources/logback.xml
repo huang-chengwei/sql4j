@@ -8,10 +8,10 @@
         </encoder>
     </appender>
 
-    <root level="info">
+    <!--<root level="info">
         <appender-ref ref="STDOUT"/>
-    </root>
-    <logger name="github.sql.dsl.internal.jdbc.sql.SqlExecutor" level="trace">
+    </root>-->
+    <logger name="jdbc.sql" level="trace">
         <appender-ref ref="STDOUT"/>
     </logger>
 </configuration>

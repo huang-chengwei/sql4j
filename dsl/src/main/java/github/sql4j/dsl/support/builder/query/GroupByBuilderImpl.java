@@ -27,8 +27,8 @@ public class GroupByBuilderImpl<T> extends AbstractResult<T> implements GroupByB
 
     @Delegate
     @Override
-    protected @NotNull GroupBy<T, GroupByBuilder<T>> getGroupable() {
-        return super.getGroupable();
+    protected @NotNull GroupBy<T, GroupByBuilder<T>> getGroupBy() {
+        return super.getGroupBy();
     }
 
     @Delegate

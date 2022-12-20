@@ -3,7 +3,7 @@ package github.sql4j.dsl.expression;
 
 import java.util.List;
 
-public class ConstantExpression<T> implements SqlExpression<T> {
+public class ConstantExpression<T> implements Expression<T> {
 
     private final T value;
 
@@ -32,7 +32,7 @@ public class ConstantExpression<T> implements SqlExpression<T> {
     }
 
     @Override
-    public List<? extends SqlExpression<?>> getExpressions() {
+    public List<? extends Expression<?>> getExpressions() {
         throw new UnsupportedOperationException();
     }
 }

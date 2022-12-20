@@ -18,8 +18,8 @@ public class SelectBuilderImpl<T> extends AbstractResult<T> implements SelectBui
 
     @Delegate
     @Override
-    protected @NotNull Where<T, SelectBuilder<T>> getObjectsWhereable() {
-        return super.getObjectsWhereable();
+    protected @NotNull Where<T, SelectBuilder<T>> getObjectsWhere() {
+        return super.getObjectsWhere();
     }
 
     @Delegate

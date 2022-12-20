@@ -88,12 +88,12 @@ public class EntityInformation<T> {
         }
 
         this.basicAttributes = Collections.unmodifiableList(basicAttributes);
-        this.basicUpdatableAttributes = Collections.unmodifiableList(
-                this.basicAttributes.stream().filter(it -> it.getColumn() == null || it.getColumn().updatable()).collect(Collectors.toList())
-        );
-        this.basicInsertableAttributes = Collections.unmodifiableList(
-                this.basicAttributes.stream().filter(it -> it.getColumn() == null || it.getColumn().insertable()).collect(Collectors.toList())
-        );
+        this.basicUpdatableAttributes = this.basicAttributes.stream()
+                .filter(it -> it.getColumn() == null
+                        || it.getColumn().updatable()).collect(Collectors.toList());
+        this.basicInsertableAttributes = this.basicAttributes.stream()
+                .filter(it -> it.getColumn() == null
+                        || it.getColumn().insertable()).collect(Collectors.toList());
         this.manyToOneAttributes = Collections.unmodifiableList(manyToOneAttributes);
         this.oneToManyAttributes = Collections.unmodifiableList(oneToManyAttributes);
         this.manyToManyAttributes = Collections.unmodifiableList(manyToManyAttributes);
@@ -109,7 +109,7 @@ public class EntityInformation<T> {
         );
     }
 
-    public static <X, Y> EntityInformation<X> getInstance(Class<X> clazz) {
+    public static <X> EntityInformation<X> getInstance(Class<X> clazz) {
         //noinspection unchecked
         return (EntityInformation<X>) MAP.computeIfAbsent(clazz, EntityInformation::new);
     }
