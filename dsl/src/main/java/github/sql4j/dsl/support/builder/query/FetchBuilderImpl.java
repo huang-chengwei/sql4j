@@ -1,7 +1,7 @@
 package github.sql4j.dsl.support.builder.query;
 
 import github.sql4j.dsl.builder.Fetch;
-import github.sql4j.dsl.builder.PredicateAssembler;
+import github.sql4j.dsl.builder.PredicateCombiner;
 import github.sql4j.dsl.builder.ResultBuilder;
 import github.sql4j.dsl.builder.Sort;
 import github.sql4j.dsl.builder.FetchBuilder;
@@ -18,14 +18,14 @@ public class FetchBuilderImpl<T> extends AbstractResult<T> implements FetchBuild
 
     @Delegate
     @Override
-    protected @NotNull PredicateAssembler<T, FetchBuilder<T>> getRestrictionBuilder() {
+    protected @NotNull PredicateCombiner<T, FetchBuilder<T>> getRestrictionBuilder() {
         return super.getRestrictionBuilder();
     }
 
     @Delegate
     @Override
-    protected @NotNull Fetch<T, FetchBuilder<T>> getFetchable() {
-        return super.getFetchable();
+    protected @NotNull Fetch<T, FetchBuilder<T>> getFetch() {
+        return super.getFetch();
     }
 
     @Delegate

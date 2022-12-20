@@ -34,7 +34,7 @@ public abstract class AbstractResult<T> {
     }
 
     @NotNull
-    protected GroupBy<T, GroupByBuilder<T>> getGroupable() {
+    protected GroupBy<T, GroupByBuilder<T>> getGroupBy() {
         return new GroupByImpl<>(criteriaQuery.groupBy(), next -> new GroupByBuilderImpl<>(
                 this.typeQueryFactory,
                 this.entityType,
@@ -48,19 +48,19 @@ public abstract class AbstractResult<T> {
     }
 
     @NotNull
-    protected Fetch<T, FetchBuilder<T>> getFetchable() {
+    protected Fetch<T, FetchBuilder<T>> getFetch() {
         return new FetchImpl<>(criteriaQuery.fetch(),
                 next -> new FetchBuilderImpl<>(typeQueryFactory, entityType, criteriaQuery.updateFetch(next)));
     }
 
     @NotNull
-    protected WhereImpl<T, WhereBuilder<T>> getWhereable() {
+    protected WhereImpl<T, WhereBuilder<T>> getWhere() {
         return new WhereImpl<>(next -> whereBuilder(criteriaQuery.updateRestriction(next)));
     }
 
     @NotNull
-    protected PredicateAssembler<T, FetchBuilder<T>> getRestrictionBuilder() {
-        return new PredicateAssemblerImpl<>(criteriaQuery.where(),
+    protected PredicateCombiner<T, FetchBuilder<T>> getRestrictionBuilder() {
+        return new PredicateCombinerImpl<>(criteriaQuery.where(),
                 next -> new FetchBuilderImpl<>(typeQueryFactory, entityType, criteriaQuery.updateRestriction(next)));
     }
 
@@ -70,7 +70,7 @@ public abstract class AbstractResult<T> {
     }
 
     @NotNull
-    protected Where<T, SelectBuilder<T>> getObjectsWhereable() {
+    protected Where<T, SelectBuilder<T>> getObjectsWhere() {
         return new WhereImpl<>(next -> {
             CriteriaQueryImpl updated = this.criteriaQuery.updateRestriction(next);
             return new SelectBuilderImpl<>(typeQueryFactory, entityType, updated);
@@ -85,8 +85,8 @@ public abstract class AbstractResult<T> {
         });
     }
 
-    protected @NotNull PredicateAssembler<T, WhereBuilder<T>> getWereBuilderRestrictionBuilder() {
-        return new PredicateAssemblerImpl<>(criteriaQuery.where(), next -> {
+    protected @NotNull PredicateCombiner<T, WhereBuilder<T>> getWereBuilderRestrictionBuilder() {
+        return new PredicateCombinerImpl<>(criteriaQuery.where(), next -> {
             CriteriaQueryImpl updated = this.criteriaQuery.updateRestriction(next);
             return new WhereBuilderImpl<>(typeQueryFactory, entityType, updated);
         });

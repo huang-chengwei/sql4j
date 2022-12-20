@@ -17,16 +17,8 @@ public interface Where<T, BUILDER> {
 
     StringPredicate<T, BUILDER> where(StringAttribute<T> column);
 
-    <U extends Entity> PathBuilder<T, U, BUILDER> whereNot(EntityAttribute<T, U> column);
-
-    <U> BasePredicate<T, U, BUILDER> whereNot(Attribute<T, U> attribute);
-
-    <U extends Number & Comparable<?>> NumberPredicate<T, U, BUILDER> whereNot(NumberAttribute<T, U> column);
-
-    <U extends Comparable<?>> ComparablePredicate<T, U, BUILDER> whereNot(ComparableAttribute<T, U> column);
-
-    StringPredicate<T, BUILDER> whereNot(StringAttribute<T> column);
-
     BUILDER where(Predicate<T> predicate);
+
+    Where<T, BUILDER> not();
 
 }

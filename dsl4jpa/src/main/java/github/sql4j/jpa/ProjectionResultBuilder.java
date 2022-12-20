@@ -1,7 +1,7 @@
 package github.sql4j.jpa;
 
 import github.sql4j.dsl.builder.ResultBuilder;
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.path.AttributePath;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.TypeQueryFactory;
@@ -54,10 +54,10 @@ class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
         for (ProjectionAttribute attribute : info) {
             paths.add(attribute.getFieldName());
         }
-        SqlExpression<?>[] selections = paths.stream()
+        Expression<?>[] selections = paths.stream()
                 .map(AttributePath::new)
-                .toArray(SqlExpression[]::new);
-        ConstantArray<SqlExpression<?>> array = new ConstantArray<>(selections);
+                .toArray(Expression[]::new);
+        ConstantArray<Expression<?>> array = new ConstantArray<>(selections);
         CriteriaQueryImpl cq = CriteriaQueryImpl.from(criteriaQuery)
                 .updateSelection(array);
         List<Object[]> objects = typeQueryFactory.getObjectsTypeQuery(cq, type)

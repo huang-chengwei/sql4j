@@ -1,7 +1,7 @@
 package github.sql4j.dsl.support.builder.criteria;
 
 import github.sql4j.dsl.builder.GroupBy;
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.path.AttributePath;
 import github.sql4j.dsl.expression.path.attribute.Attribute;
 import github.sql4j.dsl.support.builder.component.ConstantArray;
@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 
 public class GroupByImpl<T, BUILDER> implements GroupBy<T, BUILDER> {
 
-    private Array<SqlExpression<?>> values;
-    private final Function<Array<SqlExpression<?>>, BUILDER> mapper;
+    private Array<Expression<?>> values;
+    private final Function<Array<Expression<?>>, BUILDER> mapper;
 
-    public GroupByImpl(Array<SqlExpression<?>> values, Function<Array<SqlExpression<?>>, BUILDER> mapper) {
+    public GroupByImpl(Array<Expression<?>> values, Function<Array<Expression<?>>, BUILDER> mapper) {
         this.values = values == null ? new ConstantArray<>() : values;
         this.mapper = mapper;
     }

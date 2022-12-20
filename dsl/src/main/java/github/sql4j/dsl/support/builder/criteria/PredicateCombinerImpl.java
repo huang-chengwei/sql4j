@@ -1,11 +1,11 @@
 package github.sql4j.dsl.support.builder.criteria;
 
-import github.sql4j.dsl.builder.PredicateAssembler;
+import github.sql4j.dsl.builder.PredicateCombiner;
 import github.sql4j.dsl.builder.ComparablePredicate;
 import github.sql4j.dsl.builder.NumberPredicate;
 import github.sql4j.dsl.builder.BasePredicate;
 import github.sql4j.dsl.builder.StringPredicate;
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.Operator;
 import github.sql4j.dsl.expression.Predicate;
 import github.sql4j.dsl.expression.path.AttributePath;
@@ -16,13 +16,13 @@ import github.sql4j.dsl.support.builder.component.*;
 
 import java.util.function.Function;
 
-public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T, BUILDER> {
+public class PredicateCombinerImpl<T, BUILDER> implements PredicateCombiner<T, BUILDER> {
 
     protected final SubPredicateArray expression;
-    protected final Function<SqlExpression<Boolean>, BUILDER> mapper;
+    protected final Function<Expression<Boolean>, BUILDER> mapper;
 
-    public PredicateAssemblerImpl(SqlExpression<Boolean> expression,
-                                  Function<SqlExpression<Boolean>, BUILDER> mapper) {
+    public PredicateCombinerImpl(Expression<Boolean> expression,
+                                 Function<Expression<Boolean>, BUILDER> mapper) {
         this.expression = SubPredicateArray.fromExpression(expression);
         this.mapper = mapper;
     }
@@ -37,14 +37,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new PathBuilderImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public <R extends Entity> PathBuilder<T, R, BUILDER> andNot(EntityAttribute<T, R> attribute) {
         return new PathBuilderImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public <R extends Entity> PathBuilder<T, R, BUILDER> orNot(EntityAttribute<T, R> attribute) {
-        return new PathBuilderImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -57,14 +51,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new BasePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public <R> BasePredicate<T, R, BUILDER> andNot(Attribute<T, R> attribute) {
         return new BasePredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public <R> BasePredicate<T, R, BUILDER> orNot(Attribute<T, R> attribute) {
-        return new BasePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -77,14 +65,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new NumberPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public <R extends Number & Comparable<?>> NumberPredicate<T, R, BUILDER> andNot(NumberAttribute<T, R> attribute) {
         return new NumberPredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public <R extends Number & Comparable<?>> NumberPredicate<T, R, BUILDER> orNot(NumberAttribute<T, R> attribute) {
-        return new NumberPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -97,14 +79,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new ComparablePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public <R extends Comparable<?>> ComparablePredicate<T, R, BUILDER> andNot(ComparableAttribute<T, R> attribute) {
         return new ComparablePredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public <R extends Comparable<?>> ComparablePredicate<T, R, BUILDER> orNot(ComparableAttribute<T, R> attribute) {
-        return new ComparablePredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -117,14 +93,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return new StringPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, false, this::mapperNext);
     }
 
-    @Override
     public StringPredicate<T, BUILDER> andNot(StringAttribute<T> attribute) {
         return new StringPredicateImpl<>(AttributePath.exchange(attribute), Operator.AND, true, this::mapperNext);
-    }
-
-    @Override
-    public StringPredicate<T, BUILDER> orNot(StringAttribute<T> attribute) {
-        return new StringPredicateImpl<>(AttributePath.exchange(attribute), Operator.OR, true, this::mapperNext);
     }
 
     @Override
@@ -140,7 +110,7 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
     }
 
     protected BUILDER mapperNext(SubPredicate subPredicate) {
-        SqlExpression<Boolean> then = getBooleanExpression(subPredicate);
+        Expression<Boolean> then = getBooleanExpression(subPredicate);
         return next(mapper.apply(then));
     }
 
@@ -148,8 +118,8 @@ public class PredicateAssemblerImpl<T, BUILDER> implements PredicateAssembler<T,
         return BUILDER;
     }
 
-    private SqlExpression<Boolean> getBooleanExpression(SubPredicate subPredicate) {
-        SqlExpression<Boolean> expression = subPredicate.getExpression();
+    private Expression<Boolean> getBooleanExpression(SubPredicate subPredicate) {
+        Expression<Boolean> expression = subPredicate.getExpression();
         if (subPredicate.isNegate()) {
             expression = expression.then(Operator.NOT);
         }

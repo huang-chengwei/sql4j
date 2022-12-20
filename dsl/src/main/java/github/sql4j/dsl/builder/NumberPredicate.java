@@ -1,6 +1,6 @@
 package github.sql4j.dsl.builder;
 
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.path.attribute.NumberAttribute;
 
 public interface NumberPredicate<T, U extends Number & Comparable<?>, BUILDER> extends ComparablePredicate<T, U, BUILDER> {
@@ -16,15 +16,15 @@ public interface NumberPredicate<T, U extends Number & Comparable<?>, BUILDER> e
     NumberPredicate<T, U, BUILDER> mod(U v);
 
 
-    NumberPredicate<T, U, BUILDER> add(SqlExpression<U> v);
+    NumberPredicate<T, U, BUILDER> add(Expression<U> v);
 
-    NumberPredicate<T, U, BUILDER> subtract(SqlExpression<U> v);
+    NumberPredicate<T, U, BUILDER> subtract(Expression<U> v);
 
-    NumberPredicate<T, U, BUILDER> multiply(SqlExpression<U> v);
+    NumberPredicate<T, U, BUILDER> multiply(Expression<U> v);
 
-    NumberPredicate<T, U, BUILDER> divide(SqlExpression<U> v);
+    NumberPredicate<T, U, BUILDER> divide(Expression<U> v);
 
-    NumberPredicate<T, U, BUILDER> mod(SqlExpression<U> v);
+    NumberPredicate<T, U, BUILDER> mod(Expression<U> v);
 
 
     NumberPredicate<T, U, BUILDER> add(NumberAttribute<T, U> v);
