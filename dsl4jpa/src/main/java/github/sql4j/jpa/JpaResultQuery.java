@@ -6,6 +6,7 @@ import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.builder.component.Order;
 import github.sql4j.dsl.util.Array;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Fetch;
@@ -74,7 +75,11 @@ public class JpaResultQuery<T> {
         public Builder(Class<R> resultType) {
             this.resultType = resultType;
             cb = entityManager.getCriteriaBuilder();
-            this.query = cb.createQuery(resultType);
+            if (resultType == Tuple.class) {
+                //noinspection unchecked
+                this.query = (CriteriaQuery<R>) cb.createTupleQuery();
+            } else
+                this.query = cb.createQuery(resultType);
             root = query.from(entityType);
         }
 
@@ -169,6 +174,34 @@ public class JpaResultQuery<T> {
             if (where != null) {
                 query.where(toPredicate(where));
             }
+        }
+
+        public List<Tuple> getTupleList(int offset, int maxResult) {
+            buildWhere();
+            //noinspection unchecked
+            CriteriaQuery<Tuple> query = (CriteriaQuery<Tuple>) this.query;
+            Array<Expression<?>> groupBy = criteria.groupBy();
+            if (groupBy != null && !groupBy.isEmpty()) {
+                query.groupBy(
+                        groupBy.stream().map(this::toExpression).collect(Collectors.toList())
+                );
+            }
+            builderOrderBy();
+            CriteriaQuery<Tuple> select = query.multiselect(
+                    criteria.select().stream()
+                            .map(this::toExpression)
+                            .collect(Collectors.toList())
+            );
+
+            TypedQuery<Tuple> typedQuery = entityManager.createQuery(select);
+
+            if (offset > 0) {
+                typedQuery = typedQuery.setFirstResult(offset);
+            }
+            if (maxResult > 0) {
+                typedQuery = typedQuery.setMaxResults(maxResult);
+            }
+            return typedQuery.getResultList();
         }
     }
 

@@ -2,10 +2,11 @@ package jdbc.sql;
 
 
 import github.sql4j.dsl.builder.ResultBuilder;
+import github.sql4j.dsl.util.Tuple;
 
 import java.util.List;
 
-public class JdbcObjectsResultBuilder implements ResultBuilder<Object[]> {
+public class JdbcObjectsResultBuilder implements ResultBuilder<Tuple> {
 
     private final PreparedSqlExecutor executor;
     private final PreparedSqlBuilder builder;
@@ -18,7 +19,7 @@ public class JdbcObjectsResultBuilder implements ResultBuilder<Object[]> {
     }
 
     @Override
-    public List<Object[]> getList(int offset, int maxResult) {
+    public List<Tuple> getList(int offset, int maxResult) {
         return executor.listResult(builder.getObjectsList(offset, maxResult), entityType);
     }
 

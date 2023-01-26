@@ -4,6 +4,7 @@ import github.sql4j.dsl.builder.*;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.TypeQueryFactory;
 import github.sql4j.dsl.support.builder.criteria.*;
+import github.sql4j.dsl.util.Tuple;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractResult<T> {
@@ -19,7 +20,7 @@ public abstract class AbstractResult<T> {
         this.criteriaQuery = CriteriaQueryImpl.from(criteriaQuery);
     }
 
-    protected ResultBuilder<Object[]> getObjectsTypeQuery() {
+    protected ResultBuilder<Tuple> getObjectsTypeQuery() {
         return typeQueryFactory.getObjectsTypeQuery(criteriaQuery, entityType);
     }
 

@@ -3,6 +3,7 @@ package jdbc.sql;
 import github.sql4j.dsl.builder.ResultBuilder;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.TypeQueryFactory;
+import github.sql4j.dsl.util.Tuple;
 
 public class JdbcQueryTypeQueryFactory implements TypeQueryFactory {
     private final PreparedSqlExecutor executor;
@@ -25,7 +26,7 @@ public class JdbcQueryTypeQueryFactory implements TypeQueryFactory {
     }
 
     @Override
-    public ResultBuilder<Object[]> getObjectsTypeQuery(StructuredQuery criteria, Class<?> type) {
+    public ResultBuilder<Tuple> getObjectsTypeQuery(StructuredQuery criteria, Class<?> type) {
         return new JdbcObjectsResultBuilder(executor, sqlBuilder.get(criteria, type), type);
     }
 

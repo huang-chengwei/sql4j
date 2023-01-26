@@ -9,6 +9,7 @@ import github.sql4j.dsl.support.builder.component.ConstantArray;
 import github.sql4j.dsl.support.builder.query.CriteriaQueryImpl;
 import github.sql4j.dsl.support.meta.ProjectionAttribute;
 import github.sql4j.dsl.support.meta.ProjectionInformation;
+import github.sql4j.dsl.util.Tuple;
 import lombok.SneakyThrows;
 
 import java.lang.invoke.MethodHandles;
@@ -60,7 +61,7 @@ class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
         ConstantArray<Expression<?>> array = new ConstantArray<>(selections);
         CriteriaQueryImpl cq = CriteriaQueryImpl.from(criteriaQuery)
                 .updateSelection(array);
-        List<Object[]> objects = typeQueryFactory.getObjectsTypeQuery(cq, type)
+        List<Tuple> objects = typeQueryFactory.getObjectsTypeQuery(cq, type)
                 .getList(offset, maxResult);
         return objects.stream()
                 .map(os -> mapToRejection(info, paths, os, projectionType))
@@ -68,7 +69,7 @@ class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
     }
 
     @SneakyThrows
-    private R mapToRejection(ProjectionInformation info, ArrayList<String> paths, Object[] os, Class<R> projectionType) {
+    private R mapToRejection(ProjectionInformation info, ArrayList<String> paths, Tuple os, Class<R> projectionType) {
         ClassLoader classLoader = projectionType.getClassLoader();
         Class<?>[] interfaces = {projectionType, ProjectionProxyInstance.class};
 
@@ -78,7 +79,7 @@ class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
                 Map<Method, Object> map = new HashMap<>();
                 int i = 0;
                 for (ProjectionAttribute attribute : info) {
-                    Object value = os[i++];
+                    Object value = os.get(i++);
                     map.put(attribute.getGetter(), value);
                 }
                 if (map.containsKey(method)) {
@@ -122,10 +123,10 @@ class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
             });
         } else {
             R result = projectionType.getConstructor().newInstance();
-            for (int j = 0; j < os.length; j++) {
+            for (int j = 0; j < os.length(); j++) {
                 String name = paths.get(j);
                 ProjectionAttribute attribute = info.get(name);
-                Object value = os[j];
+                Object value = os.get(j);
                 attribute.setValue(result, value);
             }
             return result;
