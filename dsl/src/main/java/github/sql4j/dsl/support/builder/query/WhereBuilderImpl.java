@@ -16,7 +16,7 @@ public class WhereBuilderImpl<T> extends AbstractResult<T> implements WhereBuild
     }
 
     @Delegate
-    protected @NotNull PredicateAssembler<T, WhereBuilder<T>> getWereBuilderRestrictionBuilder() {
+    protected @NotNull PredicateCombiner<T, WhereBuilder<T>> getWereBuilderRestrictionBuilder() {
         return super.getWereBuilderRestrictionBuilder();
     }
 

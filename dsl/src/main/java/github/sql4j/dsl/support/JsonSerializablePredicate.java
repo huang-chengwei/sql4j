@@ -18,7 +18,7 @@ public class JsonSerializablePredicate {
 
     private String[] pathExpression;
 
-    private SqlExpression.Type type;
+    private Expression.Type type;
 
     private Operator operator;
 
@@ -29,7 +29,7 @@ public class JsonSerializablePredicate {
     public JsonSerializablePredicate() {
     }
 
-    public JsonSerializablePredicate(SqlExpression<?> expression) {
+    public JsonSerializablePredicate(Expression<?> expression) {
         this.type = expression.getType();
         switch (type) {
             case PATH:
@@ -37,7 +37,7 @@ public class JsonSerializablePredicate {
                 break;
             case OPERATOR:
                 this.operator = expression.getOperator();
-                List<? extends SqlExpression<?>> list = expression.getExpressions();
+                List<? extends Expression<?>> list = expression.getExpressions();
                 if (list != null) {
                     expressions = list.stream().map(JsonSerializablePredicate::new).toArray(JsonSerializablePredicate[]::new);
                 } else {
@@ -52,34 +52,34 @@ public class JsonSerializablePredicate {
 
     public <T> Predicate<T> toPredicate() {
         //noinspection unchecked
-        return new PredicateBuilder<>((SqlExpression<Boolean>) toSqlExpression());
+        return new PredicateBuilder<>((Expression<Boolean>) toSqlExpression());
     }
 
-    private SqlExpression<?> toSqlExpression() {
-        List<SqlExpression<?>> expressions = this.expressions == null ? null : Arrays.stream(this.expressions)
+    private Expression<?> toSqlExpression() {
+        List<Expression<?>> expressions = this.expressions == null ? null : Arrays.stream(this.expressions)
                 .map(JsonSerializablePredicate::toSqlExpression)
                 .collect(Collectors.toList());
         PathExpression<Object> path = pathExpression == null ? null : new PathExpression<>(pathExpression);
         Object value = this.value == null ? null : this.value.value;
-        return new SqlExpressionImpl<>(path,
+        return new ExpressionImpl<>(path,
                 type,
                 value,
                 operator,
                 expressions);
     }
 
-    private static class SqlExpressionImpl<T> implements SqlExpression<T> {
+    private static class ExpressionImpl<T> implements Expression<T> {
         final PathExpression<T> pathExpression;
         final Type type;
         final T value;
         final Operator operator;
-        final List<SqlExpression<?>> expressions;
+        final List<Expression<?>> expressions;
 
-        private SqlExpressionImpl(PathExpression<T> pathExpression,
-                                  Type type,
-                                  T value,
-                                  Operator operator,
-                                  List<SqlExpression<?>> expressions) {
+        private ExpressionImpl(PathExpression<T> pathExpression,
+                               Type type,
+                               T value,
+                               Operator operator,
+                               List<Expression<?>> expressions) {
             this.pathExpression = pathExpression;
             this.type = type;
             this.value = value;
@@ -108,7 +108,7 @@ public class JsonSerializablePredicate {
         }
 
         @Override
-        public List<? extends SqlExpression<?>> getExpressions() {
+        public List<? extends Expression<?>> getExpressions() {
             return expressions;
         }
     }

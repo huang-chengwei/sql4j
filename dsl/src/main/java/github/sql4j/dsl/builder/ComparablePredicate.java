@@ -1,6 +1,6 @@
 package github.sql4j.dsl.builder;
 
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.path.attribute.ComparableAttribute;
 
 public interface ComparablePredicate<T, U extends Comparable<?>, BUILDER>
@@ -32,24 +32,24 @@ public interface ComparablePredicate<T, U extends Comparable<?>, BUILDER>
     /**
      * greater than or equal to (>=)
      */
-    BUILDER ge(SqlExpression<U> value);
+    BUILDER ge(Expression<U> value);
 
     /**
      * greater than (>)
      */
-    BUILDER gt(SqlExpression<U> value);
+    BUILDER gt(Expression<U> value);
 
     /**
      * less than or equal to (<=)
      */
-    BUILDER le(SqlExpression<U> value);
+    BUILDER le(Expression<U> value);
 
-    BUILDER between(SqlExpression<U> a, SqlExpression<U> b);
+    BUILDER between(Expression<U> a, Expression<U> b);
 
     /**
      * less than (<)
      */
-    BUILDER lt(SqlExpression<U> value);
+    BUILDER lt(Expression<U> value);
 
     /**
      * greater than or equal to (>=)

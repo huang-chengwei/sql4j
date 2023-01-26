@@ -5,15 +5,11 @@ import github.sql4j.dsl.expression.path.Entity;
 import github.sql4j.dsl.expression.path.PathBuilder;
 import github.sql4j.dsl.expression.path.attribute.*;
 
-public interface PredicateAssembler<T, BUILDER> {
+public interface PredicateCombiner<T, BUILDER> {
 
     <R extends Entity> PathBuilder<T, R, BUILDER> and(EntityAttribute<T, R> attribute);
 
     <R extends Entity> PathBuilder<T, R, BUILDER> or(EntityAttribute<T, R> attribute);
-
-    <R extends Entity> PathBuilder<T, R, BUILDER> andNot(EntityAttribute<T, R> attribute);
-
-    <R extends Entity> PathBuilder<T, R, BUILDER> orNot(EntityAttribute<T, R> attribute);
 
     <R> BasePredicate<T, R, BUILDER> and(Attribute<T, R> attribute);
 

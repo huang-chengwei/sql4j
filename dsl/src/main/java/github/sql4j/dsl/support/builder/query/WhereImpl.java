@@ -1,34 +1,34 @@
 package github.sql4j.dsl.support.builder.query;
 
 import github.sql4j.dsl.builder.*;
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.Predicate;
 import github.sql4j.dsl.expression.path.Entity;
 import github.sql4j.dsl.expression.path.PathBuilder;
 import github.sql4j.dsl.expression.path.attribute.*;
-import github.sql4j.dsl.support.builder.criteria.PredicateAssemblerImpl;
+import github.sql4j.dsl.support.builder.criteria.PredicateCombinerImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
 public class WhereImpl<T, BUILDER> implements Where<T, BUILDER> {
 
-    private final Function<SqlExpression<Boolean>, BUILDER> mapper;
+    private final Function<Expression<Boolean>, BUILDER> mapper;
     private final boolean negate;
 
-    public WhereImpl(Function<SqlExpression<Boolean>, BUILDER> mapper) {
+    public WhereImpl(Function<Expression<Boolean>, BUILDER> mapper) {
         this.mapper = mapper;
         negate = false;
     }
 
-    public WhereImpl(Function<SqlExpression<Boolean>, BUILDER> mapper, boolean negate) {
+    public WhereImpl(Function<Expression<Boolean>, BUILDER> mapper, boolean negate) {
         this.mapper = mapper;
         this.negate = negate;
     }
 
     @NotNull
-    private PredicateAssemblerImpl<T, BUILDER> getBuilder() {
-        return new PredicateAssemblerImpl<>(null, mapper);
+    private PredicateCombinerImpl<T, BUILDER> getBuilder() {
+        return new PredicateCombinerImpl<>(null, mapper);
     }
 
 

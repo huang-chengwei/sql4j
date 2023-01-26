@@ -3,7 +3,7 @@ package jdbc.mysql;
 
 import github.sql4j.dsl.expression.Operator;
 import github.sql4j.dsl.expression.PathExpression;
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.builder.component.Order;
 import github.sql4j.dsl.support.meta.Attribute;
@@ -255,13 +255,13 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             appendExpression(criteria.where());
         }
 
-        protected void appendExpression(SqlExpression<?> e) {
+        protected void appendExpression(Expression<?> e) {
             appendExpressions(args, e);
         }
 
 
-        protected void appendExpressions(List<Object> args, SqlExpression<?> e) {
-            if (e.getType() == SqlExpression.Type.CONSTANT) {
+        protected void appendExpressions(List<Object> args, Expression<?> e) {
+            if (e.getType() == Expression.Type.CONSTANT) {
                 Object value = e.getValue();
                 boolean isNumber = false;
                 if (value != null) {
@@ -276,13 +276,13 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     appendBlank().append('?');
                     args.add(value);
                 }
-            } else if (e.getType() == SqlExpression.Type.PATH) {
+            } else if (e.getType() == Expression.Type.PATH) {
                 appendBlank();
                 appendPath(e);
-            } else if (e.getType() == SqlExpression.Type.OPERATOR) {
+            } else if (e.getType() == Expression.Type.OPERATOR) {
                 Operator operator = e.getOperator();
-                List<? extends SqlExpression<?>> list = e.getExpressions();
-                SqlExpression<?> e0 = list.get(0);
+                List<? extends Expression<?>> list = e.getExpressions();
+                Expression<?> e0 = list.get(0);
                 Operator operator0 = getOperator(e0);
                 JdbcOperator jdbcOperator = JdbcOperator.of(operator);
                 switch (operator) {
@@ -324,7 +324,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
                         appendBlank();
                         sql.append(jdbcOperator);
-                        SqlExpression<?> e1 = list.get(1);
+                        Expression<?> e1 = list.get(1);
                         Operator operator1 = getOperator(e1);
                         if (operator1 != null && JdbcOperator.of(operator1).getPrecedence()
                                 >= jdbcOperator.getPrecedence()) {
@@ -350,7 +350,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     case SUM: {
                         appendBlank().append(jdbcOperator);
                         String join = "(";
-                        for (SqlExpression<?> expression : list) {
+                        for (Expression<?> expression : list) {
                             sql.append(join);
                             appendExpressions(args, expression);
                             join = ",";
@@ -368,7 +368,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                             appendBlank().append(jdbcOperator);
                             char join = '(';
                             for (int i = 1; i < list.size(); i++) {
-                                SqlExpression<?> expression = list.get(i);
+                                Expression<?> expression = list.get(i);
                                 sql.append(join);
                                 appendExpressions(args, expression);
                                 join = ',';
@@ -392,8 +392,8 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
 
-        protected void appendPath(SqlExpression<?> expression) {
-            if (expression.getType() != SqlExpression.Type.PATH) {
+        protected void appendPath(Expression<?> expression) {
+            if (expression.getType() != Expression.Type.PATH) {
                 throw new UnsupportedOperationException();
             }
             PathExpression<?> paths = expression.asPathExpression();
@@ -457,8 +457,8 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
         }
 
-        Operator getOperator(SqlExpression<?> e) {
-            if (e.getType() == SqlExpression.Type.OPERATOR) {
+        Operator getOperator(Expression<?> e) {
+            if (e.getType() == Expression.Type.OPERATOR) {
                 return e.getOperator();
             }
             return null;
@@ -490,7 +490,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         protected void appendSelectedPath() {
-            Iterable<SqlExpression<?>> select = criteria.select();
+            Iterable<Expression<?>> select = criteria.select();
             if (select == null || !select.iterator().hasNext()) {
                 select = rootEntityInfo.getBasicAttributes()
                         .stream()
@@ -501,7 +501,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                         .collect(Collectors.toList());
             }
             String join = "";
-            for (SqlExpression<?> selection : select) {
+            for (Expression<?> selection : select) {
                 sql.append(join);
                 appendExpression(selection);
                 join = ",";
@@ -510,11 +510,11 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
 
         private void appendGroupBy() {
-            Array<SqlExpression<?>> groupBy = criteria.groupBy();
+            Array<Expression<?>> groupBy = criteria.groupBy();
             if (groupBy != null && !groupBy.isEmpty()) {
                 sql.append(" group by ");
                 boolean first = true;
-                for (SqlExpression<?> e : groupBy) {
+                for (Expression<?> e : groupBy) {
                     if (first) {
                         first = false;
                     } else {

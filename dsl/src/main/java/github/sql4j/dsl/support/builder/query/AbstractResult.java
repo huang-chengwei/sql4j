@@ -59,8 +59,8 @@ public abstract class AbstractResult<T> {
     }
 
     @NotNull
-    protected PredicateAssembler<T, FetchBuilder<T>> getRestrictionBuilder() {
-        return new PredicateAssemblerImpl<>(criteriaQuery.where(),
+    protected PredicateCombiner<T, FetchBuilder<T>> getRestrictionBuilder() {
+        return new PredicateCombinerImpl<>(criteriaQuery.where(),
                 next -> new FetchBuilderImpl<>(typeQueryFactory, entityType, criteriaQuery.updateRestriction(next)));
     }
 
@@ -85,8 +85,8 @@ public abstract class AbstractResult<T> {
         });
     }
 
-    protected @NotNull PredicateAssembler<T, WhereBuilder<T>> getWereBuilderRestrictionBuilder() {
-        return new PredicateAssemblerImpl<>(criteriaQuery.where(), next -> {
+    protected @NotNull PredicateCombiner<T, WhereBuilder<T>> getWereBuilderRestrictionBuilder() {
+        return new PredicateCombinerImpl<>(criteriaQuery.where(), next -> {
             CriteriaQueryImpl updated = this.criteriaQuery.updateRestriction(next);
             return new WhereBuilderImpl<>(typeQueryFactory, entityType, updated);
         });

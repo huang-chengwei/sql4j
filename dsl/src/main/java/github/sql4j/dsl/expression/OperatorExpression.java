@@ -1,6 +1,6 @@
 package github.sql4j.dsl.expression;
 
-public interface OperatorExpression<T> extends SqlExpression<T> {
+public interface OperatorExpression<T> extends Expression<T> {
 
     default PathExpression<T> asPathExpression() {
         throw new UnsupportedOperationException();

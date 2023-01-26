@@ -1,6 +1,6 @@
 package github.sql4j.dsl.expression.path;
 
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.PathExpression;
 import github.sql4j.dsl.expression.path.attribute.*;
 
@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class AttributePath<T, R>
         extends PathExpression<R>
-        implements Attribute<T, R>, SqlExpression<R> {
+        implements Attribute<T, R>, Expression<R> {
 
     public AttributePath(String... path) {
         super(path);

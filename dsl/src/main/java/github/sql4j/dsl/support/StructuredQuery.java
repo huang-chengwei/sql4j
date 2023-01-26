@@ -1,19 +1,19 @@
 package github.sql4j.dsl.support;
 
-import github.sql4j.dsl.expression.SqlExpression;
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.PathExpression;
 import github.sql4j.dsl.support.builder.component.Order;
 import github.sql4j.dsl.util.Array;
 
 public interface StructuredQuery {
 
-    SqlExpression<Boolean> where();
+    Expression<Boolean> where();
 
     Array<Order> orderBy();
 
-    Array<SqlExpression<?>> groupBy();
+    Array<Expression<?>> groupBy();
 
-    Array<SqlExpression<?>> select();
+    Array<Expression<?>> select();
 
     Array<PathExpression<?>> fetch();
 
