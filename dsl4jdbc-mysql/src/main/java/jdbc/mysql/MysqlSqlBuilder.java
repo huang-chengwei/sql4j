@@ -1,9 +1,9 @@
 package jdbc.mysql;
 
 
+import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.expression.Operator;
 import github.sql4j.dsl.expression.PathExpression;
-import github.sql4j.dsl.expression.Expression;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.builder.component.Order;
 import github.sql4j.dsl.support.meta.Attribute;
@@ -321,18 +321,19 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                         } else {
                             appendExpressions(args, e0);
                         }
-
-                        appendBlank();
-                        sql.append(jdbcOperator);
-                        Expression<?> e1 = list.get(1);
-                        Operator operator1 = getOperator(e1);
-                        if (operator1 != null && JdbcOperator.of(operator1).getPrecedence()
-                                >= jdbcOperator.getPrecedence()) {
-                            sql.append('(');
-                            appendExpressions(args, e1);
-                            sql.append(')');
-                        } else {
-                            appendExpressions(args, e1);
+                        for (int i = 1; i < list.size(); i++) {
+                            appendBlank();
+                            sql.append(jdbcOperator);
+                            Expression<?> e1 = list.get(i);
+                            Operator operator1 = getOperator(e1);
+                            if (operator1 != null && JdbcOperator.of(operator1).getPrecedence()
+                                    >= jdbcOperator.getPrecedence()) {
+                                sql.append('(');
+                                appendExpressions(args, e1);
+                                sql.append(')');
+                            } else {
+                                appendExpressions(args, e1);
+                            }
                         }
                         break;
                     case LOWER:

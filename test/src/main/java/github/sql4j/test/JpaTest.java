@@ -11,12 +11,13 @@ import github.sql4j.dsl.expression.path.attribute.ComparableAttribute;
 import github.sql4j.dsl.expression.path.attribute.EntityAttribute;
 import github.sql4j.dsl.support.JsonSerializablePredicate;
 import github.sql4j.dsl.support.builder.component.AggregateFunction;
+import github.sql4j.dsl.util.Tuple;
 import github.sql4j.jpa.JpaQueryBuilder;
 import github.sql4j.test.entity.User;
 import github.sql4j.test.projection.UserInterface;
 import github.sql4j.test.projection.UserModel;
 import jakarta.persistence.EntityManager;
-import github.sql4j.dsl.util.Tuple;
+import jakarta.persistence.criteria.CriteriaQuery;
 import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -54,6 +55,10 @@ public class JpaTest {
                 manager.persist(user);
             }
         });
+        CriteriaQuery<User> query = manager.getCriteriaBuilder().createQuery(User.class);
+        query.from(User.class);
+        allUsers = manager.createQuery(query)
+                .getResultList();
 
         manager.clear();
     }
@@ -84,6 +89,34 @@ public class JpaTest {
         return result;
     }
 
+    @Test
+    public void testAndOr() {
+        List<User> dbList = userQuery.where(User::getRandomNumber).not().eq(1)
+                .and(User::getRandomNumber).gt(100)
+                .and(User::getRandomNumber).not().eq(125)
+                .and(User::getRandomNumber).le(666)
+                .and(
+                        Predicate.of(User::getRandomNumber).lt(106)
+                                .or(User::getRandomNumber).gt(120)
+                                .or(User::getRandomNumber).eq(109)
+                )
+                .and(User::getRandomNumber).not().eq(128)
+                .getList();
+
+        List<User> ftList = allUsers.stream()
+                .filter(user -> user.getRandomNumber() != 1
+                        && user.getRandomNumber() > 100
+                        && user.getRandomNumber() != 125
+                        && user.getRandomNumber() <= 666
+                        && (user.getRandomNumber() < 106
+                        || user.getRandomNumber() > 120
+                        || user.getRandomNumber() == 109)
+                        && user.getRandomNumber() != 128
+                )
+                .collect(Collectors.toList());
+
+        assertEquals(dbList, ftList);
+    }
 
     @Test
     public void testComparablePredicateTesterGt() {
@@ -233,6 +266,7 @@ public class JpaTest {
     public void testOrderBy() {
         List<User> list = userQuery
                 .orderBy(User::getRandomNumber).desc()
+                .orderBy(User::getId).asc()
                 .getList();
         ArrayList<User> sorted = new ArrayList<>(allUsers);
         sorted.sort((a, b) -> Integer.compare(b.getRandomNumber(), a.getRandomNumber()));

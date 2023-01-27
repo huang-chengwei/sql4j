@@ -42,10 +42,20 @@ public class JpaPredicateBuilder<T> {
             switch (operator) {
                 case NOT:
                     return cb.not(cast(e0));
-                case AND:
-                    return cb.and(cast(e0), cast(toExpression(expressions.get(1))));
-                case OR:
-                    return cb.or(cast(e0), cast(toExpression(expressions.get(1))));
+                case AND: {
+                    jakarta.persistence.criteria.Expression<Boolean> res = cast(e0);
+                    for (int i = 1; i < expressions.size(); i++) {
+                        res = cb.and(res, cast(toExpression(expressions.get(i))));
+                    }
+                    return res;
+                }
+                case OR: {
+                    jakarta.persistence.criteria.Expression<Boolean> res = cast(e0);
+                    for (int i = 1; i < expressions.size(); i++) {
+                        res = cb.or(res, cast(toExpression(expressions.get(i))));
+                    }
+                    return res;
+                }
                 case GT: {
                     Expression<?> e1 = expressions.get(1);
                     if (e1.getType() == Expression.Type.CONSTANT) {

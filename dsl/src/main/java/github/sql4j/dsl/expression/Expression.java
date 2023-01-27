@@ -2,10 +2,7 @@ package github.sql4j.dsl.expression;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public interface Expression<T> {
@@ -33,6 +30,16 @@ public interface Expression<T> {
     static <T, X> OperatorExpressionImpl<X> thenOperator(Expression<T> e, Operator operator, Expression<?>... args) {
         if (args == null || args.length == 0) {
             return new OperatorExpressionImpl<>(Collections.singletonList(e), operator);
+        }
+        if (e.getType() == Type.OPERATOR) {
+            Operator o = e.getOperator();
+            if ((o == Operator.AND || o == Operator.OR) && operator == o) {
+                List<? extends Expression<?>> list = e.getExpressions();
+                ArrayList<Expression<?>> resExps = new ArrayList<>(list.size() + args.length);
+                resExps.addAll(list);
+                resExps.addAll(Arrays.asList(args));
+                return new OperatorExpressionImpl<>(resExps, operator);
+            }
         }
         Expression<?>[] expressions = new Expression[args.length + 1];
         expressions[0] = e;
