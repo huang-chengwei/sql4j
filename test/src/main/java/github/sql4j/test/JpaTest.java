@@ -2,6 +2,7 @@ package github.sql4j.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import github.sql4j.dsl.QueryBuilder;
+import github.sql4j.dsl.builder.AggregateSelectBuilder;
 import github.sql4j.dsl.builder.Query;
 import github.sql4j.dsl.builder.WhereBuilder;
 import github.sql4j.dsl.expression.Predicate;
@@ -10,11 +11,13 @@ import github.sql4j.dsl.expression.path.attribute.ComparableAttribute;
 import github.sql4j.dsl.expression.path.attribute.EntityAttribute;
 import github.sql4j.dsl.support.JsonSerializablePredicate;
 import github.sql4j.dsl.support.builder.component.AggregateFunction;
+import github.sql4j.dsl.util.Tuple;
 import github.sql4j.jpa.JpaQueryBuilder;
 import github.sql4j.test.entity.User;
 import github.sql4j.test.projection.UserInterface;
 import github.sql4j.test.projection.UserModel;
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaQuery;
 import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -52,6 +55,10 @@ public class JpaTest {
                 manager.persist(user);
             }
         });
+        CriteriaQuery<User> query = manager.getCriteriaBuilder().createQuery(User.class);
+        query.from(User.class);
+        allUsers = manager.createQuery(query)
+                .getResultList();
 
         manager.clear();
     }
@@ -82,6 +89,34 @@ public class JpaTest {
         return result;
     }
 
+    @Test
+    public void testAndOr() {
+        List<User> dbList = userQuery.where(User::getRandomNumber).not().eq(1)
+                .and(User::getRandomNumber).gt(100)
+                .and(User::getRandomNumber).not().eq(125)
+                .and(User::getRandomNumber).le(666)
+                .and(
+                        Predicate.of(User::getRandomNumber).lt(106)
+                                .or(User::getRandomNumber).gt(120)
+                                .or(User::getRandomNumber).eq(109)
+                )
+                .and(User::getRandomNumber).not().eq(128)
+                .getList();
+
+        List<User> ftList = allUsers.stream()
+                .filter(user -> user.getRandomNumber() != 1
+                        && user.getRandomNumber() > 100
+                        && user.getRandomNumber() != 125
+                        && user.getRandomNumber() <= 666
+                        && (user.getRandomNumber() < 106
+                        || user.getRandomNumber() > 120
+                        || user.getRandomNumber() == 109)
+                        && user.getRandomNumber() != 128
+                )
+                .collect(Collectors.toList());
+
+        assertEquals(dbList, ftList);
+    }
 
     @Test
     public void testComparablePredicateTesterGt() {
@@ -119,13 +154,15 @@ public class JpaTest {
 
     @Test
     public void testAggregateFunction() {
-        Object[] aggregated = userQuery
+        AggregateSelectBuilder<User> select = userQuery
                 .select(User::getRandomNumber, AggregateFunction.MIN)
                 .select(User::getRandomNumber, AggregateFunction.MAX)
                 .select(User::getRandomNumber, AggregateFunction.COUNT)
                 .select(User::getRandomNumber, AggregateFunction.AVG)
-                .select(User::getRandomNumber, AggregateFunction.SUM)
-                .requireSingle();
+                .select(User::getRandomNumber, AggregateFunction.SUM);
+        Object[] aggregated = select
+                .requireSingle()
+                .toArray();
         assertNotNull(aggregated);
         assertEquals(getUserIdStream().min().orElse(0), aggregated[0]);
         assertEquals(getUserIdStream().max().orElse(0), aggregated[1]);
@@ -139,7 +176,10 @@ public class JpaTest {
                 .groupBy(User::getRandomNumber)
                 .select(User::getRandomNumber)
                 .where(User::isValid).eq(true)
-                .getList();
+                .getList()
+                .stream()
+                .map(Tuple::toArray)
+                .collect(Collectors.toList());
 
         Map<Integer, Optional<User>> map = allUsers.stream()
                 .filter(User::isValid)
@@ -158,7 +198,8 @@ public class JpaTest {
         Object[] one = userQuery
                 .select(User::getId, AggregateFunction.SUM)
                 .where(User::isValid).eq(true)
-                .requireSingle();
+                .requireSingle()
+                .toArray();
 
         int userId = allUsers.stream()
                 .filter(User::isValid)
@@ -169,7 +210,8 @@ public class JpaTest {
         Object[] first = userQuery
                 .select(User::getId)
                 .orderBy(User::getId).desc()
-                .getFirst();
+                .getFirst()
+                .toArray();
         assertEquals(first[0], allUsers.get(allUsers.size() - 1).getId());
     }
 
@@ -178,7 +220,9 @@ public class JpaTest {
         List<Object[]> qList = userQuery
                 .select(User::getRandomNumber)
                 .select(User::getUsername)
-                .getList();
+                .getList()
+                .stream().map(Tuple::toArray)
+                .collect(Collectors.toList());
 
         List<Object[]> fList = allUsers.stream()
                 .map(it -> new Object[]{it.getRandomNumber(), it.getUsername()})
@@ -196,14 +240,18 @@ public class JpaTest {
                 .select(User::isValid)
                 .select(User::getRandomNumber)
                 .select(User::getPid)
-                .getList();
+                .getList()
+                .stream().map(Tuple::toArray)
+                .collect(Collectors.toList());
 
         List<Object[]> resultList2 = userQuery
                 .groupBy(User::getRandomNumber)
                 .groupBy(Arrays.asList(User::getPid, User::isValid))
                 .select(User::isValid)
                 .select(Arrays.asList(User::getRandomNumber, User::getPid))
-                .getList();
+                .getList()
+                .stream().map(Tuple::toArray)
+                .collect(Collectors.toList());
         assertEqualsArrayList(resultList, resultList2);
     }
 
@@ -218,6 +266,7 @@ public class JpaTest {
     public void testOrderBy() {
         List<User> list = userQuery
                 .orderBy(User::getRandomNumber).desc()
+                .orderBy(User::getId).asc()
                 .getList();
         ArrayList<User> sorted = new ArrayList<>(allUsers);
         sorted.sort((a, b) -> Integer.compare(b.getRandomNumber(), a.getRandomNumber()));
@@ -905,7 +954,9 @@ public class JpaTest {
         assertEquals(resultList, subList);
 
         List<Object[]> userIds = userQuery.select(User::getId)
-                .getList(5, 10);
+                .getList(5, 10)
+                .stream().map(Tuple::toArray)
+                .collect(Collectors.toList());
         List<Object[]> subUserIds = allUsers.subList(5, 5 + 10)
                 .stream().map(it -> new Object[]{it.getId()})
                 .collect(Collectors.toList());

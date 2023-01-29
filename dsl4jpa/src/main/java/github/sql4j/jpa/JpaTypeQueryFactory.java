@@ -5,6 +5,7 @@ import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.TypeQueryFactory;
 
 import javax.persistence.EntityManager;
+import github.sql4j.dsl.util.Tuple;
 
 public class JpaTypeQueryFactory implements TypeQueryFactory {
 
@@ -26,7 +27,7 @@ public class JpaTypeQueryFactory implements TypeQueryFactory {
     }
 
     @Override
-    public ResultBuilder<Object[]> getObjectsTypeQuery(StructuredQuery criteriaQuery, Class<?> type) {
+    public ResultBuilder<Tuple> getObjectsTypeQuery(StructuredQuery criteriaQuery, Class<?> type) {
         return new JpaObjectsResultBuilder<>(entityManager, type, criteriaQuery);
     }
 

@@ -1,6 +1,7 @@
 package github.sql4j.dsl.support;
 
 import github.sql4j.dsl.builder.ResultBuilder;
+import github.sql4j.dsl.util.Tuple;
 
 public interface TypeQueryFactory {
 
@@ -10,6 +11,6 @@ public interface TypeQueryFactory {
                                                Class<T> type,
                                                Class<R> projectionType);
 
-    ResultBuilder<Object[]> getObjectsTypeQuery(StructuredQuery criteriaQuery, Class<?> type);
+    ResultBuilder<Tuple> getObjectsTypeQuery(StructuredQuery criteriaQuery, Class<?> type);
 
 }

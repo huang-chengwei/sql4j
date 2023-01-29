@@ -7,6 +7,7 @@ import github.sql4j.dsl.builder.SelectBuilder;
 import github.sql4j.dsl.builder.Where;
 import github.sql4j.dsl.support.StructuredQuery;
 import github.sql4j.dsl.support.TypeQueryFactory;
+import github.sql4j.dsl.util.Tuple;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +37,7 @@ public class SelectBuilderImpl<T> extends AbstractResult<T> implements SelectBui
 
     @Delegate
     @Override
-    protected ResultBuilder<Object[]> getObjectsTypeQuery() {
+    protected ResultBuilder<Tuple> getObjectsTypeQuery() {
         return super.getObjectsTypeQuery();
     }
 

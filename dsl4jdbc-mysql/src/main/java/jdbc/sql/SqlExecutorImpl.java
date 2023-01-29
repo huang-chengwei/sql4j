@@ -1,8 +1,10 @@
 package jdbc.sql;
 
 import github.sql4j.dsl.expression.PathExpression;
+import github.sql4j.dsl.support.domain.TupleImpl;
 import github.sql4j.dsl.support.meta.Attribute;
 import github.sql4j.dsl.support.meta.EntityInformation;
+import github.sql4j.dsl.util.Tuple;
 import jdbc.util.JdbcUtil;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SqlExecutorImpl implements PreparedSqlExecutor {
 
@@ -68,8 +71,8 @@ public class SqlExecutorImpl implements PreparedSqlExecutor {
     }
 
     @Override
-    public List<Object[]> listResult(PreparedSql sql, Class<?> entityType) {
-        return getResultSet(sql, resultSet -> {
+    public List<Tuple> listResult(PreparedSql sql, Class<?> entityType) {
+        List<Object[]> objects = getResultSet(sql, resultSet -> {
             List<Object[]> result = new ArrayList<>();
             int columnsCount = resultSet.getMetaData().getColumnCount();
             while (resultSet.next()) {
@@ -81,6 +84,9 @@ public class SqlExecutorImpl implements PreparedSqlExecutor {
             }
             return result;
         });
+        return objects.stream()
+                .map(TupleImpl::new)
+                .collect(Collectors.toList());
     }
 
     @Override
