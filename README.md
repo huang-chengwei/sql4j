@@ -146,33 +146,33 @@ public class Example {
 
     private static void runExample(Query<Employee> query) {
 
-        // selectClause * from employee whereClause id = 1
+        // select * from employee where id = 1
         query.where(Employee::getId).eq(1).getSingle();
 
 
-        // selectClause employee.*, company.* from
+        // select employee.*, company.* from
         // employee left join company
         // on employee.company_id = company.id
-        // whereClause employee.id = 1
+        // where employee.id = 1
         query.where(Employee::getId).eq(1)
                 .fetch(Employee::getCompany)
                 .getSingle();
 
-        // selectClause * from employee whereClause name = 'Luna' and age > 10
+        // select * from employee where name = 'Luna' and age > 10
         query.where(Employee::getName).eq("Luna")
                 .and(Employee::getAge).gt(10)
                 .getList();
 
-        // selectClause * from employee whereClause name = 'Luna' and age > 10 order by id desc limit 0,100
+        // select * from employee where name = 'Luna' and age > 10 order by id desc limit 0,100
         query.where(Employee::getName).eq("Luna")
                 .and(Employee::getAge).gt(10)
                 .orderBy(Employee::getId).desc()
                 .getList(0, 100);
 
-        // selectClause employee.* from
+        // select employee.* from
         // employee left join company
         // on employee.company_id = company.id
-        // whereClause company.name = 'Microsoft'
+        // where company.name = 'Microsoft'
         query.where(Employee::getCompany).map(Company::getName).eq("Microsoft").getList();
     }
 
