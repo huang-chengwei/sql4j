@@ -1,6 +1,6 @@
 package jdbc.mysql;
 
-import github.sql4j.dsl.expression.Operator;
+import github.alittlehuang.sql4j.dsl.expression.Operator;
 import lombok.Getter;
 
 @Getter

@@ -1,8 +1,9 @@
 package jdbc.sql;
 
 
-import github.sql4j.dsl.builder.ResultBuilder;
-import github.sql4j.dsl.util.Tuple;
+import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
+import github.alittlehuang.sql4j.dsl.util.Tuple;
+import jakarta.persistence.LockModeType;
 
 import java.util.List;
 
@@ -19,8 +20,8 @@ public class JdbcObjectsResultBuilder implements ResultBuilder<Tuple> {
     }
 
     @Override
-    public List<Tuple> getList(int offset, int maxResult) {
-        return executor.listResult(builder.getObjectsList(offset, maxResult), entityType);
+    public List<Tuple> getList(int offset, int maxResult, LockModeType lockModeType) {
+        return executor.listResult(builder.getObjectsList(offset, maxResult, lockModeType), entityType);
     }
 
     @Override

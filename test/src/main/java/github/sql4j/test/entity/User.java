@@ -1,6 +1,6 @@
 package github.sql4j.test.entity;
 
-import github.sql4j.dsl.expression.path.Entity;
+import github.alittlehuang.sql4j.dsl.expression.path.Persistable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -17,7 +17,7 @@ import java.util.Objects;
 @ToString
 @Getter
 @Setter
-public class User implements Entity {
+public class User implements Persistable {
 
     @Id
     private int id;

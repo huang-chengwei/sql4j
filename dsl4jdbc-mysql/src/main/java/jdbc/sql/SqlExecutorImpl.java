@@ -1,10 +1,10 @@
 package jdbc.sql;
 
-import github.sql4j.dsl.expression.PathExpression;
-import github.sql4j.dsl.support.domain.TupleImpl;
-import github.sql4j.dsl.support.meta.Attribute;
-import github.sql4j.dsl.support.meta.EntityInformation;
-import github.sql4j.dsl.util.Tuple;
+import github.alittlehuang.sql4j.dsl.expression.PathExpression;
+import github.alittlehuang.sql4j.dsl.support.builder.operator.DefaultTuple;
+import github.alittlehuang.sql4j.dsl.support.meta.Attribute;
+import github.alittlehuang.sql4j.dsl.support.meta.EntityInformation;
+import github.alittlehuang.sql4j.dsl.util.Tuple;
 import jdbc.util.JdbcUtil;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -35,11 +35,11 @@ public class SqlExecutorImpl implements PreparedSqlExecutor {
         List<T> result = new ArrayList<>();
         int columnsCount = resultSet.getMetaData().getColumnCount();
         while (resultSet.next()) {
-            List<PathExpression<?>> selectedPath = sql.getSelectedPath();
+            List<PathExpression> selectedPath = sql.getSelectedPath();
             T row = type.getConstructor().newInstance();
             for (int i = 0; i < columnsCount; i++) {
-                PathExpression<?> path = selectedPath.get(i);
-                int size = path.size();
+                PathExpression path = selectedPath.get(i);
+                int size = path.length();
                 EntityInformation<T> info = EntityInformation.getInstance(type);
                 Object entity = row;
                 Object object = resultSet.getObject(i + 1);
@@ -85,7 +85,7 @@ public class SqlExecutorImpl implements PreparedSqlExecutor {
             return result;
         });
         return objects.stream()
-                .map(TupleImpl::new)
+                .map(DefaultTuple::new)
                 .collect(Collectors.toList());
     }
 

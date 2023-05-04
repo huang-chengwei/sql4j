@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>sql4j</artifactId>
-        <groupId>github.sql4j</groupId>
-        <version>2.0-SNAPSHOT</version>
+        <groupId>github.alittlehuang.sql4j</groupId>
+        <version>3.0.0</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>github.sql4j</groupId>
+            <groupId>github.alittlehuang.sql4j</groupId>
             <artifactId>sql4j-dsl</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -32,8 +32,8 @@
     <artifactId>dsl4jdbc-mysql</artifactId>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
 </project>

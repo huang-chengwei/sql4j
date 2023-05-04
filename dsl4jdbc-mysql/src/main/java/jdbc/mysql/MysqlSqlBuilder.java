@@ -1,17 +1,13 @@
 package jdbc.mysql;
 
 
-import github.sql4j.dsl.expression.Expression;
-import github.sql4j.dsl.expression.Operator;
-import github.sql4j.dsl.expression.PathExpression;
-import github.sql4j.dsl.support.StructuredQuery;
-import github.sql4j.dsl.support.builder.component.Order;
-import github.sql4j.dsl.support.meta.Attribute;
-import github.sql4j.dsl.support.meta.EntityInformation;
-import github.sql4j.dsl.support.meta.ProjectionAttribute;
-import github.sql4j.dsl.support.meta.ProjectionInformation;
-import github.sql4j.dsl.util.Array;
-import github.sql4j.dsl.util.Assert;
+import github.alittlehuang.sql4j.dsl.expression.*;
+import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
+import github.alittlehuang.sql4j.dsl.support.meta.Attribute;
+import github.alittlehuang.sql4j.dsl.support.meta.EntityInformation;
+import github.alittlehuang.sql4j.dsl.util.Array;
+import github.alittlehuang.sql4j.dsl.util.Assert;
+import jakarta.persistence.LockModeType;
 import jdbc.sql.PreparedSql;
 import jdbc.sql.PreparedSqlBuilder;
 import jdbc.sql.SelectedPreparedSql;
@@ -21,35 +17,32 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static github.sql4j.dsl.expression.Operator.AND;
+import static github.alittlehuang.sql4j.dsl.expression.Operator.AND;
 
 
 public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
-    protected final StructuredQuery criteria;
+    protected final QuerySpecification criteria;
     protected final EntityInformation<?> rootEntityInfo;
 
-    public MysqlSqlBuilder(StructuredQuery criteria, Class<?> javaType) {
+    public MysqlSqlBuilder(QuerySpecification criteria, Class<?> javaType) {
         this.criteria = criteria;
         this.rootEntityInfo = getEntityInformation(javaType);
     }
 
-    public static PathExpression<?> to(PathExpression<?> expression, String path) {
-        String[] values = Stream.concat(expression.stream(), Stream.of(path))
-                .toArray(String[]::new);
-        return new PathExpression<>(values);
+    public static PathExpression to(PathExpression expression, String path) {
+        return expression.to(path);
     }
 
     @Override
-    public SelectedPreparedSql getEntityList(int offset, int maxResultant) {
-        return new EntityBuilder().getEntityList(offset, maxResultant);
+    public SelectedPreparedSql getEntityList(int offset, int maxResultant, LockModeType lockModeType) {
+        return new EntityBuilder().getEntityList(offset, maxResultant, lockModeType);
     }
 
     @Override
-    public PreparedSql getObjectsList(int offset, int maxResultant) {
-        return new Builder().getObjectsList(offset, maxResultant);
+    public PreparedSql getObjectsList(int offset, int maxResultant, LockModeType lockModeType) {
+        return new Builder().getObjectsList(offset, maxResultant, lockModeType);
     }
 
     @Override
@@ -62,11 +55,6 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         return new Builder().count();
     }
 
-    @Override
-    public SelectedPreparedSql getProjectionList(int offset, int maxResult, Class<?> projectionType) {
-        return new ProjectionBuilder(projectionType).getProjectionList(offset, maxResult);
-    }
-
     public EntityInformation<?> getEntityInformation(Attribute attribute) {
         return getEntityInformation(attribute.getJavaType());
     }
@@ -77,48 +65,15 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         return info;
     }
 
-    private class ProjectionBuilder extends Builder implements SelectedPreparedSql {
-        protected final List<PathExpression<?>> selectedPath = new ArrayList<>();
-        private final Class<?> projectionType;
-
-        private ProjectionBuilder(Class<?> projectionType) {
-            this.projectionType = projectionType;
-        }
-
-        protected SelectedPreparedSql getProjectionList(int offset, int maxResult) {
-            sql.append("select ");
-            appendProjectionPath();
-            appendQueryConditions(offset, maxResult);
-            return this;
-        }
-
-        private void appendProjectionPath() {
-            String join = "";
-            ProjectionInformation attributes = ProjectionInformation
-                    .get(rootEntityInfo.getJavaType(), projectionType);
-            for (ProjectionAttribute basicAttribute : attributes) {
-                sql.append(join);
-                PathExpression<Object> path = new PathExpression<>(basicAttribute.getFieldName());
-                appendPath(path);
-                selectedPath.add(path);
-                join = ",";
-            }
-        }
-
-        @Override
-        public List<PathExpression<?>> getSelectedPath() {
-            return selectedPath;
-        }
-    }
-
     private class EntityBuilder extends Builder implements SelectedPreparedSql {
-        protected final List<PathExpression<?>> selectedPath = new ArrayList<>();
+        protected final List<PathExpression> selectedPath = new ArrayList<>();
 
-        protected SelectedPreparedSql getEntityList(int offset, int maxResult) {
+        protected SelectedPreparedSql getEntityList(int offset, int maxResult, LockModeType lockModeType) {
             sql.append("select ");
             appendEntityPath();
             appendFetchPath();
             appendQueryConditions(offset, maxResult);
+            appendLockModeType(lockModeType);
             return this;
         }
 
@@ -126,7 +81,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             String join = "";
             for (Attribute basicAttribute : rootEntityInfo.getBasicAttributes()) {
                 sql.append(join);
-                PathExpression<Object> path = new PathExpression<>(basicAttribute.getFieldName());
+                PathExpression path = new PathExpression(basicAttribute.getFieldName());
                 appendPath(path);
                 selectedPath.add(path);
                 join = ",";
@@ -134,13 +89,14 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         protected void appendFetchPath() {
-            if (criteria.fetch() != null) {
-                for (PathExpression<?> fetch : criteria.fetch()) {
+            Array<PathExpression> fetchClause = criteria.fetchClause();
+            if (fetchClause != null) {
+                for (PathExpression fetch : fetchClause) {
                     Attribute attribute = getAttribute(fetch);
                     EntityInformation<?> entityInfo = getEntityInformation(attribute);
                     for (Attribute basicAttribute : entityInfo.getBasicAttributes()) {
                         sql.append(",");
-                        PathExpression<?> path = to(fetch, basicAttribute.getFieldName());
+                        PathExpression path = fetch.to(basicAttribute.getFieldName());
                         appendPath(path);
                         selectedPath.add(path);
                     }
@@ -149,7 +105,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         @Override
-        public List<PathExpression<?>> getSelectedPath() {
+        public List<PathExpression> getSelectedPath() {
             return selectedPath;
         }
     }
@@ -157,9 +113,9 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
     protected class Builder implements PreparedSql {
         protected final StringBuilder sql = new StringBuilder();
         protected final List<Object> args = new ArrayList<>();
-        protected final Map<PathExpression<?>, Integer> joins = new LinkedHashMap<>();
+        protected final Map<PathExpression, Integer> joins = new LinkedHashMap<>();
 
-        protected PreparedSql getObjectsList(int offset, int maxResult) {
+        protected PreparedSql getObjectsList(int offset, int maxResult, LockModeType lockModeType) {
             sql.append("select ");
             appendSelectedPath();
             appendBlank()
@@ -173,7 +129,18 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             appendOrderBy();
             limit(offset, maxResult);
             insertJoin(sqlIndex);
+            appendLockModeType(lockModeType);
             return this;
+        }
+
+        protected void appendLockModeType(LockModeType lockModeType) {
+            if (lockModeType == LockModeType.PESSIMISTIC_READ) {
+                sql.append(" for share");
+            } else if (lockModeType == LockModeType.PESSIMISTIC_WRITE) {
+                sql.append(" for update");
+            } else if (lockModeType == LockModeType.PESSIMISTIC_FORCE_INCREMENT) {
+                sql.append(" for update nowait");
+            }
         }
 
         protected void appendQueryConditions(int offset, int maxResult) {
@@ -248,21 +215,21 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
 
         protected void appendWhere() {
-            if (criteria.where() == null) {
+            if (criteria.whereClause() == null) {
                 return;
             }
             sql.append(" where ");
-            appendExpression(criteria.where());
+            appendExpression(criteria.whereClause());
         }
 
-        protected void appendExpression(Expression<?> e) {
+        protected void appendExpression(Expression e) {
             appendExpressions(args, e);
         }
 
 
-        protected void appendExpressions(List<Object> args, Expression<?> e) {
-            if (e.getType() == Expression.Type.CONSTANT) {
-                Object value = e.getValue();
+        protected void appendExpressions(List<Object> args, Expression e) {
+            if (e instanceof ConstantExpression ce) {
+                Object value = ce.value();
                 boolean isNumber = false;
                 if (value != null) {
                     Class<?> valueType = value.getClass();
@@ -276,21 +243,22 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     appendBlank().append('?');
                     args.add(value);
                 }
-            } else if (e.getType() == Expression.Type.PATH) {
+            } else if (e instanceof PathExpression pe) {
                 appendBlank();
-                appendPath(e);
-            } else if (e.getType() == Expression.Type.OPERATOR) {
-                Operator operator = e.getOperator();
-                List<? extends Expression<?>> list = e.getExpressions();
-                Expression<?> e0 = list.get(0);
+                appendPath(pe);
+            } else if (e instanceof OperatorExpression oe) {
+                Operator operator = oe.operator();
+                Array<Expression> list = oe.expressions();
+                Expression e0 = list.get(0);
                 Operator operator0 = getOperator(e0);
                 JdbcOperator jdbcOperator = JdbcOperator.of(operator);
+                // noinspection EnhancedSwitchMigration
                 switch (operator) {
                     case NOT:
                         appendBlank().append(jdbcOperator);
                         sql.append(' ');
                         if (operator0 != null && JdbcOperator.of(operator0).getPrecedence()
-                                > jdbcOperator.getPrecedence()) {
+                                                 > jdbcOperator.getPrecedence()) {
                             sql.append('(');
                             appendExpressions(args, e0);
                             sql.append(')');
@@ -314,20 +282,20 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     case DIVIDE:
                         appendBlank();
                         if (operator0 != null && JdbcOperator.of(operator0).getPrecedence()
-                                > jdbcOperator.getPrecedence()) {
+                                                 > jdbcOperator.getPrecedence()) {
                             sql.append('(');
                             appendExpressions(args, e0);
                             sql.append(')');
                         } else {
                             appendExpressions(args, e0);
                         }
-                        for (int i = 1; i < list.size(); i++) {
+                        for (int i = 1; i < list.length(); i++) {
                             appendBlank();
                             sql.append(jdbcOperator);
-                            Expression<?> e1 = list.get(i);
+                            Expression e1 = list.get(i);
                             Operator operator1 = getOperator(e1);
                             if (operator1 != null && JdbcOperator.of(operator1).getPrecedence()
-                                    >= jdbcOperator.getPrecedence()) {
+                                                     >= jdbcOperator.getPrecedence()) {
                                 sql.append('(');
                                 appendExpressions(args, e1);
                                 sql.append(')');
@@ -351,7 +319,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     case SUM: {
                         appendBlank().append(jdbcOperator);
                         String join = "(";
-                        for (Expression<?> expression : list) {
+                        for (Expression expression : list) {
                             sql.append(join);
                             appendExpressions(args, expression);
                             join = ",";
@@ -360,7 +328,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                         break;
                     }
                     case IN: {
-                        if (list.size() == 1) {
+                        if (list.length() == 1) {
                             appendBlank().append(0);
                         } else {
                             appendBlank();
@@ -368,8 +336,8 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
                             appendBlank().append(jdbcOperator);
                             char join = '(';
-                            for (int i = 1; i < list.size(); i++) {
-                                Expression<?> expression = list.get(i);
+                            for (int i = 1; i < list.length(); i++) {
+                                Expression expression = list.get(i);
                                 sql.append(join);
                                 appendExpressions(args, expression);
                                 join = ',';
@@ -382,7 +350,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                         appendBlank();
                         appendExpressions(args, list.get(0));
                         appendBlank().append(jdbcOperator).append(" ");
-                        appendExpressions(args, list.get(1).then(AND, list.get(2)));
+                        appendExpressions(args, list.get(1).operate(AND, list.get(2)));
                         break;
                     default:
                         throw new UnsupportedOperationException("unknown operator " + operator);
@@ -393,24 +361,20 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
 
-        protected void appendPath(Expression<?> expression) {
-            if (expression.getType() != Expression.Type.PATH) {
-                throw new UnsupportedOperationException();
-            }
-            PathExpression<?> paths = expression.asPathExpression();
+        protected void appendPath(PathExpression expression) {
             StringBuilder sb = sql;
-            int iMax = paths.size() - 1;
+            int iMax = expression.length() - 1;
             if (iMax == -1)
                 return;
             int i = 0;
-            if (paths.size() == 1) {
+            if (expression.length() == 1) {
                 appendRootTableAlias().append(".");
             }
             Class<?> type = MysqlSqlBuilder.this.rootEntityInfo.getJavaType();
 
-            PathExpression<?> join = new PathExpression<>(paths.get(0));
+            PathExpression join = new PathExpression(expression.get(0));
 
-            for (String path : paths) {
+            for (String path : expression.path()) {
                 EntityInformation<?> info = getEntityInformation(type);
                 Attribute attribute = info.getAttribute(path);
                 if (i++ == iMax) {
@@ -438,7 +402,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
                 appendTableAlice(sql, attribute, v);
                 sql.append(" on ");
-                PathExpression<?> parent = k.parent();
+                PathExpression parent = k.parent();
                 if (parent == null) {
                     appendRootTableAlias(sql);
                 } else {
@@ -458,11 +422,8 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
         }
 
-        Operator getOperator(Expression<?> e) {
-            if (e.getType() == Expression.Type.OPERATOR) {
-                return e.getOperator();
-            }
-            return null;
+        Operator getOperator(Expression e) {
+            return e instanceof OperatorExpression expression ? expression.operator() : null;
         }
 
         protected StringBuilder appendTableAlice(StringBuilder sb, Attribute attribute, Integer index) {
@@ -470,9 +431,9 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             return sb.append(information.getTableName().charAt(0)).append("_j").append(index).append("_");
         }
 
-        protected Attribute getAttribute(PathExpression<?> path) {
+        protected Attribute getAttribute(PathExpression path) {
             Attribute attribute = null;
-            for (String s : path.asPathExpression()) {
+            for (String s : path.path()) {
                 EntityInformation<?> entityInfo = attribute == null
                         ? rootEntityInfo
                         : getEntityInformation(attribute);
@@ -491,18 +452,18 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         protected void appendSelectedPath() {
-            Iterable<Expression<?>> select = criteria.select();
+            Iterable<Expression> select = criteria.selectClause();
             if (select == null || !select.iterator().hasNext()) {
                 select = rootEntityInfo.getBasicAttributes()
                         .stream()
                         .map(i -> {
                             String fieldName = i.getFieldName();
-                            return new PathExpression<>(fieldName);
+                            return new PathExpression(fieldName);
                         })
                         .collect(Collectors.toList());
             }
             String join = "";
-            for (Expression<?> selection : select) {
+            for (Expression selection : select) {
                 sql.append(join);
                 appendExpression(selection);
                 join = ",";
@@ -511,11 +472,11 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
 
         private void appendGroupBy() {
-            Array<Expression<?>> groupBy = criteria.groupBy();
+            Array<Expression> groupBy = criteria.groupByClause();
             if (groupBy != null && !groupBy.isEmpty()) {
                 sql.append(" group by ");
                 boolean first = true;
-                for (Expression<?> e : groupBy) {
+                for (Expression e : groupBy) {
                     if (first) {
                         first = false;
                     } else {
@@ -528,18 +489,18 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         protected void appendOrderBy() {
-            Array<Order> orders = criteria.orderBy();
+            Array<SortSpecification> orders = criteria.sortSpec();
             if (orders != null && !orders.isEmpty()) {
                 sql.append(" order by ");
                 boolean first = true;
-                for (Order order : orders) {
+                for (SortSpecification order : orders) {
                     if (first) {
                         first = false;
                     } else {
                         sql.append(",");
                     }
-                    appendExpression(order.getExpression());
-                    sql.append(" ").append(order.isDesc() ? "desc" : "asc");
+                    appendExpression(order.expression());
+                    sql.append(" ").append(order.desc() ? "desc" : "asc");
                 }
 
             }

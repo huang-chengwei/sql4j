@@ -1,10 +1,10 @@
 package jdbc.sql;
 
 
-import github.sql4j.dsl.support.StructuredQuery;
+import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 
 public interface SqlBuilderFactory {
 
-    PreparedSqlBuilder get(StructuredQuery criteria, Class<?> type);
+    PreparedSqlBuilder get(QuerySpecification criteria, Class<?> type);
 
 }

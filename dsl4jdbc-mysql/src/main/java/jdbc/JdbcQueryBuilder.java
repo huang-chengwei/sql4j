@@ -1,13 +1,13 @@
 package jdbc;
 
 
-import github.sql4j.dsl.support.TypeQueryFactory;
-import github.sql4j.dsl.support.builder.query.AbstractQueryBuilder;
+import github.alittlehuang.sql4j.dsl.support.ResultQueryFactory;
+import github.alittlehuang.sql4j.dsl.support.builder.AbstractQueryBuilder;
 import jdbc.sql.*;
 
 public class JdbcQueryBuilder extends AbstractQueryBuilder {
 
-    public JdbcQueryBuilder(TypeQueryFactory typeQueryFactory) {
+    public JdbcQueryBuilder(ResultQueryFactory typeQueryFactory) {
         super(typeQueryFactory);
     }
 

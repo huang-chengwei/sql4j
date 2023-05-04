@@ -1,6 +1,6 @@
 package jdbc.sql;
 
-import github.sql4j.dsl.util.Tuple;
+import github.alittlehuang.sql4j.dsl.util.Tuple;
 
 import java.util.List;
 
