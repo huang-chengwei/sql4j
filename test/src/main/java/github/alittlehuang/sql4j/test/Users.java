@@ -1,6 +1,6 @@
-package github.sql4j.test;
+package github.alittlehuang.sql4j.test;
 
-import github.sql4j.test.entity.User;
+import github.alittlehuang.sql4j.test.entity.User;
 
 import java.sql.Timestamp;
 import java.time.Duration;

@@ -80,28 +80,31 @@ INSERT INTO `employee` VALUES (1, 18, 1, 'Luna');
 SET FOREIGN_KEY_CHECKS = 1;
 ```
 
-### org/example/Company.java
+### github/alittlehuang/sql4j/example/Company.java
 
 ```java
-package org.example;
+package github.alittlehuang.sql4j.example;
 
+import github.alittlehuang.sql4j.dsl.expression.path.Persistable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
 @Entity
-public class Company implements github.sql4j.dsl.expression.path.Entity {
+public class Company implements Persistable {
+
     @Id
     private Integer id;
     private String name;
     private String addr;
+
 }
 ```
 
-### org/example/Employee.java
+### github/alittlehuang/sql4j/example/Employee.java
 ```java
-package org.example;
+package github.alittlehuang.sql4j.example;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -120,14 +123,14 @@ public class Employee {
 }
 ```
 
-### org/example/Example.java
+### github/alittlehuang/sql4j/example/Example.java
 
 ```java
-package org.example;
+package github.alittlehuang.sql4j.example;
 
-import dsl.github.alittlehuang.sql4j.QueryBuilder;
-import builder.dsl.github.alittlehuang.sql4j.Query;
-import jpa.github.alittlehuang.sql4j.JpaQueryBuilder;
+import github.alittlehuang.sql4j.dsl.QueryBuilder;
+import github.alittlehuang.sql4j.dsl.builder.Query;
+import github.alittlehuang.sql4j.jpa.JpaQueryBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -177,4 +180,5 @@ public class Example {
     }
 
 }
+
 ```

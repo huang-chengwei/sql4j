@@ -1,4 +1,4 @@
-package github.sql4j.test.projection;
+package github.alittlehuang.sql4j.test.projection;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,6 +1,6 @@
-package github.sql4j.test.projection;
+package github.alittlehuang.sql4j.test.projection;
 
-import github.sql4j.test.entity.User;
+import github.alittlehuang.sql4j.test.entity.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

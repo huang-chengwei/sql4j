@@ -1,4 +1,4 @@
-package github.sql4j.test.entity;
+package github.alittlehuang.sql4j.test.entity;
 
 import github.alittlehuang.sql4j.dsl.expression.path.Persistable;
 import jakarta.persistence.FetchType;

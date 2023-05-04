@@ -1,4 +1,4 @@
-package github.sql4j.test;
+package github.alittlehuang.sql4j.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import github.alittlehuang.sql4j.dsl.QueryBuilder;
@@ -12,9 +12,9 @@ import github.alittlehuang.sql4j.dsl.support.builder.operator.Predicates;
 import github.alittlehuang.sql4j.dsl.support.serializ.json.SerializableExpression;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
 import github.alittlehuang.sql4j.jpa.JpaQueryBuilder;
-import github.sql4j.test.entity.User;
-import github.sql4j.test.projection.UserInterface;
-import github.sql4j.test.projection.UserModel;
+import github.alittlehuang.sql4j.test.projection.UserModel;
+import github.alittlehuang.sql4j.test.entity.User;
+import github.alittlehuang.sql4j.test.projection.UserInterface;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.LockModeType;

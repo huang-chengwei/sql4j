@@ -1,8 +1,8 @@
-package github.sql4j.test;
+package github.alittlehuang.sql4j.test;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import github.alittlehuang.sql4j.dsl.QueryBuilder;
-import github.sql4j.test.entity.User;
+import github.alittlehuang.sql4j.test.entity.User;
 import jdbc.JdbcQueryBuilder;
 import jdbc.mysql.MysqlSqlBuilder;
 import jdbc.sql.SqlExecutor;
