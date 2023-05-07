@@ -21,7 +21,7 @@ public class SerializableExpression implements ExpressionSupplier {
     }
 
     public ConstantExpressionModel getC() {
-        return expression instanceof ConstantExpression c ? new ConstantExpressionModel(c.value()) : null;
+        return expression instanceof ConstantExpression  ? new ConstantExpressionModel(((ConstantExpression) expression).value()) : null;
     }
 
     public void setC(ConstantExpressionModel serializer) {
@@ -29,7 +29,7 @@ public class SerializableExpression implements ExpressionSupplier {
     }
 
     public OperatorExpressionModel getO() {
-        return expression instanceof OperatorExpression c ? new OperatorExpressionModel(c) : null;
+        return expression instanceof OperatorExpression ? new OperatorExpressionModel((OperatorExpression) expression) : null;
     }
 
     public void setO(OperatorExpressionModel serializer) {
@@ -37,7 +37,7 @@ public class SerializableExpression implements ExpressionSupplier {
     }
 
     public String[] getP() {
-        return expression instanceof PathExpression c ? c.toArray() : null;
+        return expression instanceof PathExpression  ? ((PathExpression) expression).toArray() : null;
     }
 
     public void setP(String[] serializer) {

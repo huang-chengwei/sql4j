@@ -34,10 +34,10 @@ public final class DefaultTuple implements Tuple {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DefaultTuple tuple)) {
+        if (!(o instanceof DefaultTuple)) {
             return false;
         }
-        return Arrays.equals(data, tuple.data);
+        return Arrays.equals(data, ((DefaultTuple) o).data);
     }
 
     @Override

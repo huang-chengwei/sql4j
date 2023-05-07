@@ -3,20 +3,21 @@ package github.alittlehuang.sql4j.example;
 import github.alittlehuang.sql4j.dsl.QueryBuilder;
 import github.alittlehuang.sql4j.dsl.builder.Query;
 import github.alittlehuang.sql4j.jpa.JpaQueryBuilder;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 public class Example {
 
     public static void main(String[] args) {
 
-        try (EntityManagerFactory factory = Persistence.createEntityManagerFactory("org.hibernate.jpa")) {
-            EntityManager em = factory.createEntityManager();
-            QueryBuilder builder = new JpaQueryBuilder(em);
-            Query<Employee> query = builder.query(Employee.class);
-            runExample(query);
-        }
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("org.hibernate.jpa");
+        EntityManager em = factory.createEntityManager();
+        QueryBuilder builder = new JpaQueryBuilder(em);
+        Query<Employee> query = builder.query(Employee.class);
+        runExample(query);
+
     }
 
     private static void runExample(Query<Employee> query) {

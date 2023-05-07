@@ -34,8 +34,8 @@ public class ConstantArray<T> implements Array<T> {
     }
 
     public ConstantArray(Iterable<? extends T> values) {
-        this.values = values instanceof Collection<?> c
-                ? c.toArray()
+        this.values = values instanceof Collection<?>
+                ? ((Collection<?>) values).toArray()
                 : StreamSupport.stream(values.spliterator(), false).toArray();
     }
 

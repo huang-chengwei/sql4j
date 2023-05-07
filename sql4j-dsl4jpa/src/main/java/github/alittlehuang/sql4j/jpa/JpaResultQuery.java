@@ -6,14 +6,14 @@ import github.alittlehuang.sql4j.dsl.expression.SortSpecification;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Fetch;
-import jakarta.persistence.criteria.JoinType;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.Tuple;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Fetch;
+import javax.persistence.criteria.JoinType;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -173,7 +173,7 @@ public class JpaResultQuery<T> {
             buildWhere();
             Array<Expression> groupBy = criteria.groupByClause();
             if (groupBy != null && !groupBy.isEmpty()) {
-                List<jakarta.persistence.criteria.Expression<?>> grouping = groupBy.stream().map(this::toExpression).collect(Collectors.toList());
+                List<javax.persistence.criteria.Expression<?>> grouping = groupBy.stream().map(this::toExpression).collect(Collectors.toList());
                 query.groupBy(
                         grouping
                 );

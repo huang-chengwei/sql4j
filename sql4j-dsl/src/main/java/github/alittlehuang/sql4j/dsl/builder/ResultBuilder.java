@@ -3,6 +3,7 @@ package github.alittlehuang.sql4j.dsl.builder;
 import github.alittlehuang.sql4j.dsl.util.Assert;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -128,7 +129,7 @@ public interface ResultBuilder<T> {
     default Slice<T> slice(Sliceable sliceable) {
         int count = count();
         if (count == 0) {
-            return new Slice<>(List.of(), sliceable, 0);
+            return new Slice<>(Collections.emptyList(), sliceable, 0);
         } else {
             List<T> list = getList(sliceable.offset(), sliceable.size());
             return new Slice<>(list, sliceable, count);

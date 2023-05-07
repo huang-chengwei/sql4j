@@ -3,44 +3,43 @@ package github.alittlehuang.sql4j.dsl.expression;
 import github.alittlehuang.sql4j.dsl.support.builder.operator.ConstantArray;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public sealed interface Expression extends ExpressionSupplier permits PathExpression, ConstantExpression, OperatorExpression {
+public interface Expression extends ExpressionSupplier {
 
     Expression TRUE = new ConstantExpression(true);
     Expression FALSE = new ConstantExpression(false);
 
     static Expression of(Object value) {
-        if (value instanceof ExpressionSupplier builder) {
-            return builder.expression();
+        if (value instanceof ExpressionSupplier) {
+            return ((ExpressionSupplier) value).expression();
         }
         return new ConstantExpression(value);
     }
 
     default Expression operate(Operator operator, Expression expression) {
-        return operatorExpression(this, operator, List.of(expression));
+        return operatorExpression(this, operator, Collections.singletonList(expression));
     }
 
     default Expression operate(Operator operator, Object object) {
-        return operatorExpression(this, operator, List.of(of(object)));
+        return operatorExpression(this, operator, Collections.singletonList(of(object)));
     }
 
     default Expression operate(Operator operator, Object o1, Object o2) {
-        return operatorExpression(this, operator, List.of(of(o1), of(o2)));
+        return operatorExpression(this, operator, Arrays.asList(of(o1), of(o2)));
     }
 
     default Expression operate(Operator operator) {
-        return operatorExpression(this, operator, List.of());
+        return operatorExpression(this, operator, Collections.emptyList());
     }
 
     default Expression operate(Operator operator, Iterable<?> objects) {
         List<Expression> expressions = StreamSupport
                 .stream(objects.spliterator(), false)
                 .map(Expression::of)
-                .toList();
+                .collect(Collectors.toList());
         return operatorExpression(this, operator, expressions);
     }
 
@@ -57,7 +56,7 @@ public sealed interface Expression extends ExpressionSupplier permits PathExpres
     }
 
     @NotNull
-    private static Expression operatorExpression(Expression expression, Operator operator, Collection<? extends Expression> expressions) {
+    static Expression operatorExpression(Expression expression, Operator operator, Collection<? extends Expression> expressions) {
         if (operator == Operator.AND) {
             if (FALSE.equals(expression) || expressions.stream().anyMatch(FALSE::equals)) {
                 return FALSE;
@@ -66,7 +65,7 @@ public sealed interface Expression extends ExpressionSupplier permits PathExpres
                 return of(expressions, operator);
             }
             if (expressions.stream().anyMatch(TRUE::equals)) {
-                expressions = expressions.stream().filter(it -> !TRUE.equals(it)).toList();
+                expressions = expressions.stream().filter(it -> !TRUE.equals(it)).collect(Collectors.toList());
             }
         } else if (operator == Operator.OR) {
             if (TRUE.equals(expression) || expressions.stream().anyMatch(TRUE::equals)) {
@@ -76,7 +75,7 @@ public sealed interface Expression extends ExpressionSupplier permits PathExpres
                 return of(expressions, operator);
             }
             if (expressions.stream().anyMatch(FALSE::equals)) {
-                expressions = expressions.stream().filter(it -> !FALSE.equals(it)).toList();
+                expressions = expressions.stream().filter(it -> !FALSE.equals(it)).collect(Collectors.toList());
             }
         }
 
@@ -85,10 +84,11 @@ public sealed interface Expression extends ExpressionSupplier permits PathExpres
     }
 
     @NotNull
-    private static List<Expression> toList(Expression expression, Operator operator, Collection<? extends Expression> expressions) {
+    static List<Expression> toList(Expression expression, Operator operator, Collection<? extends Expression> expressions) {
         if ((operator == Operator.AND || operator == Operator.OR)
-            && expression instanceof OperatorExpression oe
-            && operator == oe.operator()) {
+            && expression instanceof OperatorExpression
+            && operator == ((OperatorExpression) expression).operator()) {
+            OperatorExpression oe = (OperatorExpression) expression;
             ArrayList<Expression> list = new ArrayList<>(expressions.size() + oe.expressions().length());
             for (Expression e : oe.expressions()) {
                 list.add(e);

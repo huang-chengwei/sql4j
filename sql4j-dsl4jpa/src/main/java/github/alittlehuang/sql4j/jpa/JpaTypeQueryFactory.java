@@ -3,10 +3,11 @@ package github.alittlehuang.sql4j.jpa;
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 import github.alittlehuang.sql4j.dsl.support.ResultBuilderFactory;
-import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMetaProvider;
 import github.alittlehuang.sql4j.dsl.support.builder.projection.ProjectionResultBuilder;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMetaProvider;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
-import jakarta.persistence.EntityManager;
+
+import javax.persistence.EntityManager;
 
 public class JpaTypeQueryFactory implements ResultBuilderFactory {
 

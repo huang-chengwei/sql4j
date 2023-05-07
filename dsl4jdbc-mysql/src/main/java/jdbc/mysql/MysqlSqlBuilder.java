@@ -4,10 +4,10 @@ package jdbc.mysql;
 import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 import github.alittlehuang.sql4j.dsl.expression.*;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
-import jdbc.meta.Attribute;
-import jdbc.meta.EntityInformation;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.Assert;
+import jdbc.meta.Attribute;
+import jdbc.meta.EntityInformation;
 import jdbc.sql.PreparedSql;
 import jdbc.sql.PreparedSqlBuilder;
 import jdbc.sql.SelectedPreparedSql;
@@ -228,7 +228,8 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
 
         protected void appendExpressions(List<Object> args, Expression e) {
-            if (e instanceof ConstantExpression ce) {
+            if (e instanceof ConstantExpression) {
+                ConstantExpression ce = (ConstantExpression) e;
                 Object value = ce.value();
                 boolean isNumber = false;
                 if (value != null) {
@@ -243,16 +244,15 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     appendBlank().append('?');
                     args.add(value);
                 }
-            } else if (e instanceof PathExpression pe) {
+            } else if (e instanceof PathExpression) {
                 appendBlank();
-                appendPath(pe);
-            } else if (e instanceof OperatorExpression oe) {
-                Operator operator = oe.operator();
-                Array<Expression> list = oe.expressions();
+                appendPath((PathExpression) e);
+            } else if (e instanceof OperatorExpression) {
+                Operator operator = ((OperatorExpression) e).operator();
+                Array<Expression> list = ((OperatorExpression) e).expressions();
                 Expression e0 = list.get(0);
                 Operator operator0 = getOperator(e0);
                 JdbcOperator jdbcOperator = JdbcOperator.of(operator);
-                // noinspection EnhancedSwitchMigration
                 switch (operator) {
                     case NOT:
                         appendBlank().append(jdbcOperator);
@@ -423,7 +423,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         Operator getOperator(Expression e) {
-            return e instanceof OperatorExpression expression ? expression.operator() : null;
+            return e instanceof OperatorExpression ? ((OperatorExpression) e).operator() : null;
         }
 
         protected StringBuilder appendTableAlice(StringBuilder sb, Attribute attribute, Integer index) {

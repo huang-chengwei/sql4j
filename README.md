@@ -12,10 +12,10 @@
              version="2.0">
     <persistence-unit name="org.hibernate.jpa">
         <properties>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql:///sql-dsl"/>
-            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.password" value="root"/>
-            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql:///sql-dsl"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.password" value="root"/>
+            <property name="javax.persistence.jdbc.user" value="root"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.show_sql" value="true"/>
@@ -86,8 +86,8 @@ SET FOREIGN_KEY_CHECKS = 1;
 package github.alittlehuang.sql4j.example;
 
 import github.alittlehuang.sql4j.dsl.expression.path.Persistable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import lombok.Data;
 
 @Data
@@ -106,7 +106,7 @@ public class Company implements Persistable {
 ```java
 package github.alittlehuang.sql4j.example;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 
 @Data
@@ -131,9 +131,9 @@ package github.alittlehuang.sql4j.example;
 import github.alittlehuang.sql4j.dsl.QueryBuilder;
 import github.alittlehuang.sql4j.dsl.builder.Query;
 import github.alittlehuang.sql4j.jpa.JpaQueryBuilder;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 public class Example {
 

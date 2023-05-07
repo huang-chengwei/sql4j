@@ -58,7 +58,7 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
 
     @Override
     public List<R> getList(int offset, int maxResult, LockModeType lockModeType) {
-        var info = projectionInformationProvider.getProjectionAttributes(type, projectionType);
+        ProjectionMeta info = projectionInformationProvider.getProjectionAttributes(type, projectionType);
         ArrayList<String> paths = new ArrayList<>();
         for (ProjectionAttribute attribute : info) {
             paths.add(attribute.getFieldName());
@@ -112,7 +112,8 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
                     if (proxy == args[0]) {
                         return true;
                     }
-                    if (args[0] instanceof ProjectionProxyInstance instance) {
+                    if (args[0] instanceof ProjectionProxyInstance) {
+                        ProjectionProxyInstance instance = (ProjectionProxyInstance) args[0];
                         if (instance.__projectionClassOfProjectionProxyInstance__() == projectionType) {
                             return map.equals(instance.__dataMapOfProjectionProxyInstance__());
                         }

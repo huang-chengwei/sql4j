@@ -5,7 +5,7 @@
     <parent>
         <artifactId>sql4j</artifactId>
         <groupId>github.alittlehuang.sql4j</groupId>
-        <version>3.0.0</version>
+        <version>2.0.0</version>
     </parent>
 
     <dependencies>
@@ -21,8 +21,8 @@
         </dependency>
 
         <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
             <scope>compile</scope>
         </dependency>
 
@@ -38,8 +38,8 @@
     <artifactId>dsl4jdbc-mysql</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
 </project>

@@ -5,8 +5,8 @@ import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 import github.alittlehuang.sql4j.dsl.support.builder.operator.DefaultTuple;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
-import jakarta.persistence.EntityManager;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -26,8 +26,8 @@ public class FlowPredicateOperate {
         if (a == null) {
             return b;
         }
-        if (operator == Operator.AND && a instanceof OperatorExpression oe && oe.operator() == Operator.OR) {
-            ConstantArray<Expression> expressions = ConstantArray.from(oe.expressions());
+        if (operator == Operator.AND && a instanceof OperatorExpression  && ((OperatorExpression) a).operator() == Operator.OR) {
+            ConstantArray<Expression> expressions = ConstantArray.from(((OperatorExpression) a).expressions());
             expressions = expressions.replace(expressions.length() - 1, it -> it.operate(Operator.AND, b));
             return Expression.of(expressions, Operator.OR);
         } else {

@@ -1,7 +1,8 @@
 package github.alittlehuang.sql4j.example;
 
-import jakarta.persistence.*;
 import lombok.Data;
+
+import javax.persistence.*;
 
 @Data
 @Entity

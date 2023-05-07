@@ -2,9 +2,9 @@ package jdbc.meta;
 
 import github.alittlehuang.sql4j.dsl.util.Assert;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
-import jakarta.persistence.*;
 import lombok.Getter;
 
+import javax.persistence.*;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -91,10 +91,10 @@ public class EntityInformation<T> {
         this.basicAttributes = Collections.unmodifiableList(basicAttributes);
         this.basicUpdatableAttributes = this.basicAttributes.stream()
                 .filter(it -> it.getColumn() == null
-                              || it.getColumn().updatable()).toList();
+                              || it.getColumn().updatable()).collect(Collectors.toList());
         this.basicInsertableAttributes = this.basicAttributes.stream()
                 .filter(it -> it.getColumn() == null
-                              || it.getColumn().insertable()).toList();
+                              || it.getColumn().insertable()).collect(Collectors.toList());
         this.manyToOneAttributes = Collections.unmodifiableList(manyToOneAttributes);
         this.oneToManyAttributes = Collections.unmodifiableList(oneToManyAttributes);
         this.manyToManyAttributes = Collections.unmodifiableList(manyToManyAttributes);

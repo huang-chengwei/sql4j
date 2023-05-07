@@ -21,7 +21,7 @@ public interface Array<T> extends Iterable<T> {
     @Override
     default Iterator<T> iterator() {
 
-        return new Iterator<>() {
+        return new Iterator<T>() {
 
             private int cursor = 0;
 

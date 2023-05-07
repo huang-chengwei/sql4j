@@ -2,9 +2,9 @@ package jdbc.sql;
 
 import github.alittlehuang.sql4j.dsl.expression.PathExpression;
 import github.alittlehuang.sql4j.dsl.support.builder.operator.DefaultTuple;
+import github.alittlehuang.sql4j.dsl.util.Tuple;
 import jdbc.meta.Attribute;
 import jdbc.meta.EntityInformation;
-import github.alittlehuang.sql4j.dsl.util.Tuple;
 import jdbc.util.JdbcUtil;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;

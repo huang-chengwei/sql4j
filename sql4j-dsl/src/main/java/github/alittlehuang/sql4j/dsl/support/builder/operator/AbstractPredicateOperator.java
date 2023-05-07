@@ -108,12 +108,12 @@ public abstract class AbstractPredicateOperator<T, U, BUILDER> implements Predic
     }
 
     public PredicateOperator<T, U, BUILDER> nullIf(U value) {
-        var builder = dataBuilder.data(data -> data.operate(Operator.NULLIF, value));
+        DataAction<Expression, ? super Expression, BUILDER> builder = dataBuilder.data(data -> data.operate(Operator.NULLIF, value));
         return new DefaultPredicateOperator<>(builder);
     }
 
     public PredicateOperator<T, U, BUILDER> ifNull(U value) {
-        var builder = dataBuilder.data(data -> data.operate(Operator.IF_NULL, value));
+        DataAction<Expression, ? super Expression, BUILDER> builder = dataBuilder.data(data -> data.operate(Operator.IF_NULL, value));
         return new DefaultPredicateOperator<>(builder);
     }
 

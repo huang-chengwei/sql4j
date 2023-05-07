@@ -1,9 +1,10 @@
 package github.alittlehuang.sql4j.example;
 
 import github.alittlehuang.sql4j.dsl.expression.path.Persistable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.Data;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Data
 @Entity

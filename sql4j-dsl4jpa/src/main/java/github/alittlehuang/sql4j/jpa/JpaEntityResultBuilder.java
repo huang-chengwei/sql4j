@@ -3,8 +3,8 @@ package github.alittlehuang.sql4j.jpa;
 import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
-import jakarta.persistence.EntityManager;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 public class JpaEntityResultBuilder<T> extends JpaResultQuery<T> implements ResultBuilder<T> {

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -22,13 +23,13 @@ public class OperatorExpressionModel implements ExpressionSupplier {
     public OperatorExpressionModel(OperatorExpression expression) {
         es = expression.expressions().stream()
                 .map(SerializableExpression::new)
-                .toList();
+                .collect(Collectors.toList());
         o = expression.operator();
     }
 
     @Override
     public Expression expression() {
-        return Expression.of(es.stream().map(ExpressionSupplier::expression).toList(), o);
+        return Expression.of(es.stream().map(ExpressionSupplier::expression).collect(Collectors.toList()), o);
     }
 
 

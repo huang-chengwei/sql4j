@@ -1,7 +1,6 @@
 package jdbc.meta;
 
-import jakarta.persistence.*;
-
+import javax.persistence.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 
@@ -66,7 +65,7 @@ public class Attribute {
     }
 
     public void setValue(Object entity, Object value) {
-        boolean accessible = field.canAccess(entity);
+        boolean accessible = field.isAccessible();
         try {
             if (setter != null) {
                 setter.invoke(entity, value);
@@ -84,7 +83,7 @@ public class Attribute {
     }
 
     public Object getValue(Object entity) {
-        boolean accessible = field.canAccess(entity);
+        boolean accessible = field.isAccessible();
         try {
             Object result;
             if (getter != null) {
@@ -127,7 +126,8 @@ public class Attribute {
         Class<?> fieldType = field.getType();
         if (collection) {
             Type genericType = field.getGenericType();
-            if (genericType instanceof ParameterizedType parameterizedType) {
+            if (genericType instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) genericType;
                 Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
                 if (actualTypeArguments.length == 1) {
                     Type actualTypeArgument = actualTypeArguments[0];

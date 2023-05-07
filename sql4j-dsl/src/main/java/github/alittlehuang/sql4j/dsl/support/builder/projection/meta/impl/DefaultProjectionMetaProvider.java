@@ -1,8 +1,8 @@
 package github.alittlehuang.sql4j.dsl.support.builder.projection.meta.impl;
 
 import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionAttribute;
-import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMetaProvider;
 import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMeta;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMetaProvider;
 import github.alittlehuang.sql4j.dsl.util.BasicTypes;
 import lombok.Lombok;
 

@@ -6,8 +6,8 @@ import github.alittlehuang.sql4j.dsl.expression.OperatorExpression;
 import github.alittlehuang.sql4j.dsl.expression.PathExpression;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
-import jakarta.persistence.criteria.*;
 
+import javax.persistence.criteria.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,37 +23,36 @@ public class JpaPredicateBuilder<T> {
     }
 
     public Predicate toPredicate(github.alittlehuang.sql4j.dsl.expression.Expression expression) {
-        jakarta.persistence.criteria.Expression<?> result = toExpression(expression);
+        javax.persistence.criteria.Expression<?> result = toExpression(expression);
         if (result instanceof Predicate) {
             return (Predicate) result;
         }
         return cb.isTrue(cast(toExpression(expression)));
     }
 
-    public jakarta.persistence.criteria.Expression<?> toExpression(github.alittlehuang.sql4j.dsl.expression.Expression expression) {
-        if (expression instanceof ConstantExpression cv) {
-            return cb.literal(cv.value());
+    public javax.persistence.criteria.Expression<?> toExpression(github.alittlehuang.sql4j.dsl.expression.Expression expression) {
+        if (expression instanceof ConstantExpression) {
+            return cb.literal(((ConstantExpression) expression).value());
         }
-        if (expression instanceof PathExpression pv) {
-            return getPath(pv);
+        if (expression instanceof PathExpression) {
+            return getPath((PathExpression) expression);
         }
-        if (expression instanceof OperatorExpression ov) {
-            Array<? extends github.alittlehuang.sql4j.dsl.expression.Expression> expressions = ov.expressions();
-            Operator operator = ov.operator();
-            jakarta.persistence.criteria.Expression<?> e0 = toExpression(expressions.get(0));
-            // noinspection EnhancedSwitchMigration
+        if (expression instanceof OperatorExpression) {
+            Array<? extends github.alittlehuang.sql4j.dsl.expression.Expression> expressions = ((OperatorExpression) expression).expressions();
+            Operator operator = ((OperatorExpression) expression).operator();
+            javax.persistence.criteria.Expression<?> e0 = toExpression(expressions.get(0));
             switch (operator) {
                 case NOT:
                     return cb.not(cast(e0));
                 case AND: {
-                    jakarta.persistence.criteria.Expression<Boolean> res = cast(e0);
+                    javax.persistence.criteria.Expression<Boolean> res = cast(e0);
                     for (int i = 1; i < expressions.length(); i++) {
                         res = cb.and(res, cast(toExpression(expressions.get(i))));
                     }
                     return res;
                 }
                 case OR: {
-                    jakarta.persistence.criteria.Expression<Boolean> res = cast(e0);
+                    javax.persistence.criteria.Expression<Boolean> res = cast(e0);
                     for (int i = 1; i < expressions.length(); i++) {
                         res = cb.or(res, cast(toExpression(expressions.get(i))));
                     }
@@ -61,7 +60,8 @@ public class JpaPredicateBuilder<T> {
                 }
                 case GT: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv = (ConstantExpression) e1;
                         if (cv.value() instanceof Number) {
                             return cb.gt(cast(e0), (Number) cv.value());
                         } else if (cv.value() instanceof Comparable) {
@@ -73,21 +73,23 @@ public class JpaPredicateBuilder<T> {
                 }
                 case EQ: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
-                        return cb.equal(cast(e0), cv.value());
+                    if (e1 instanceof ConstantExpression) {
+                        return cb.equal(cast(e0), ((ConstantExpression) e1).value());
                     }
                     return cb.equal(e0, toExpression(e1));
                 }
                 case NE: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv = (ConstantExpression) e1;
                         return cb.notEqual(e0, cv.value());
                     }
                     return cb.notEqual(e0, toExpression(e1));
                 }
                 case GE: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv = (ConstantExpression) e1;
                         if (cv.value() instanceof Number) {
                             return cb.ge(cast(e0), (Number) cv.value());
                         } else if (cv.value() instanceof Comparable) {
@@ -99,7 +101,8 @@ public class JpaPredicateBuilder<T> {
                 }
                 case LT: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv = (ConstantExpression) e1;
                         Object ve1 = cv.value();
                         if (ve1 instanceof Number) {
                             return cb.lt(cast(e0), (Number) ve1);
@@ -112,7 +115,8 @@ public class JpaPredicateBuilder<T> {
                 }
                 case LE: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv = (ConstantExpression) e1;
                         Object ve1 = cv.value();
                         if (ve1 instanceof Number) {
                             return cb.le(cast(e0), (Number) ve1);
@@ -125,8 +129,11 @@ public class JpaPredicateBuilder<T> {
                 }
                 case LIKE: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv && cv.value() instanceof String scv) {
-                        return cb.like(cast(e0), scv);
+                    if (e1 instanceof ConstantExpression) {
+                        Object value = ((ConstantExpression) e1).value();
+                        if (value instanceof String) {
+                            return cb.like(cast(e0), value.toString());
+                        }
                     }
                     return cb.like(cast(e0), cast(toExpression(e1)));
                 }
@@ -137,7 +144,8 @@ public class JpaPredicateBuilder<T> {
                         CriteriaBuilder.In<Object> in = cb.in(e0);
                         for (int i = 1; i < expressions.length(); i++) {
                             github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(i);
-                            if (e1 instanceof ConstantExpression cv) {
+                            if (e1 instanceof ConstantExpression) {
+                                ConstantExpression cv = (ConstantExpression) e1;
                                 in = in.value(cv.value());
                             } else {
                                 in = in.value(toExpression(e1));
@@ -151,13 +159,16 @@ public class JpaPredicateBuilder<T> {
                 case BETWEEN: {
                     github.alittlehuang.sql4j.dsl.expression.Expression se1 = expressions.get(1);
                     github.alittlehuang.sql4j.dsl.expression.Expression se2 = expressions.get(2);
-                    if (se1 instanceof ConstantExpression cv1
-                        && se2 instanceof ConstantExpression cv2
-                        && cv1.value() instanceof Comparable
-                        && cv2.value() instanceof Comparable) {
-                        Comparable<Object> v1 = TypeCastUtil.cast(cv1.value());
-                        Comparable<Object> v2 = TypeCastUtil.cast(cv2.value());
-                        return cb.between(cast(e0), v1, v2);
+                    if (se1 instanceof ConstantExpression
+                        && se2 instanceof ConstantExpression) {
+                        ConstantExpression cv1 = (ConstantExpression) se1;
+                        ConstantExpression cv2 = (ConstantExpression) se2;
+                        if (cv1.value() instanceof Comparable
+                            && cv2.value() instanceof Comparable) {
+                            Comparable<Object> v1 = TypeCastUtil.cast(cv1.value());
+                            Comparable<Object> v2 = TypeCastUtil.cast(cv2.value());
+                            return cb.between(cast(e0), v1, v2);
+                        }
                     }
                     return cb.between(
                             cast(e0),
@@ -172,19 +183,26 @@ public class JpaPredicateBuilder<T> {
                 case SUBSTRING: {
                     if (expressions.length() == 2) {
                         github.alittlehuang.sql4j.dsl.expression.Expression se1 = expressions.get(1);
-                        if (se1 instanceof ConstantExpression cv1
-                            && cv1.value() instanceof Number number) {
-                            return cb.substring(cast(e0), number.intValue());
+                        if (se1 instanceof ConstantExpression) {
+                            ConstantExpression cv1 = (ConstantExpression) se1;
+                            if (cv1.value() instanceof Number) {
+                                return cb.substring(cast(e0), ((Number) cv1.value()).intValue());
+                            }
                         }
                         return cb.substring(cast(e0), cast(toExpression(se1)));
                     } else if (expressions.length() == 3) {
                         github.alittlehuang.sql4j.dsl.expression.Expression se1 = expressions.get(1);
                         github.alittlehuang.sql4j.dsl.expression.Expression se2 = expressions.get(2);
-                        if (se1 instanceof ConstantExpression cv1
-                            && cv1.value() instanceof Number n1
-                            && se2 instanceof ConstantExpression cv2
-                            && cv2.value() instanceof Number n2) {
-                            return cb.substring(cast(e0), n1.intValue(), n2.intValue());
+                        if (se1 instanceof ConstantExpression
+                            && se2 instanceof ConstantExpression) {
+                            ConstantExpression cv1 = (ConstantExpression) se1;
+                            ConstantExpression cv2 = (ConstantExpression) se2;
+                            Object n1 = cv1.value();
+                            Object n2 = cv2.value();
+                            if (n1 instanceof Number
+                                && n2 instanceof Number) {
+                                return cb.substring(cast(e0), ((Number) n1).intValue(), ((Number) n2).intValue());
+                            }
                         }
                         return cb.substring(
                                 cast(e0),
@@ -201,50 +219,67 @@ public class JpaPredicateBuilder<T> {
                     return cb.length(cast(e0));
                 case ADD: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv1 && cv1.value() instanceof Number number) {
-                        return cb.sum(cast(e0), number);
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv1 = (ConstantExpression) e1;
+                        if ((cv1).value() instanceof Number) {
+                            return cb.sum(cast(e0), (Number) cv1.value());
+                        }
                     }
                     return cb.sum(cast(e0), cast(toExpression(e1)));
                 }
                 case SUBTRACT: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv1 && cv1.value() instanceof Number number) {
-                        return cb.diff(cast(e0), number);
+                    if (e1 instanceof ConstantExpression) {
+                        Object number = ((ConstantExpression) e1).value();
+                        if (number instanceof Number) {
+                            return cb.diff(cast(e0), (Number) number);
+                        }
                     }
                     return cb.diff(cast(e0), cast(toExpression(e1)));
                 }
                 case MULTIPLY: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv1 && cv1.value() instanceof Number) {
-                        return cb.prod(cast(e0), (Number) cv1.value());
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv1 = (ConstantExpression) e1;
+                        Object value = cv1.value();
+                        if (value instanceof Number) {
+                            return cb.prod(cast(e0), (Number) value);
+                        }
                     }
                     return cb.prod(cast(e0), cast(toExpression(e1)));
                 }
                 case DIVIDE: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv1 && cv1.value() instanceof Number number) {
-                        return cb.quot(cast(e0), number);
+                    if (e1 instanceof ConstantExpression) {
+                        Object number = ((ConstantExpression) e1).value();
+                        if (number instanceof Number) {
+                            return cb.quot(cast(e0), (Number) number);
+                        }
                     }
                     return cb.quot(cast(e0), cast(toExpression(e1)));
                 }
                 case MOD: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv1
-                        && cv1.value() instanceof Integer) {
-                        return cb.mod(cast(e0), ((Integer) cv1.value()));
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv1 = (ConstantExpression) e1;
+                        if (cv1.value() instanceof Integer) {
+                            return cb.mod(cast(e0), ((Integer) cv1.value()));
+                        }
                     }
                     return cb.mod(cast(e0), cast(toExpression(e1)));
                 }
                 case NULLIF: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv = (ConstantExpression) e1;
                         return cb.nullif(cast(e0), ((Integer) cv.value()));
                     }
                     return cb.nullif(e0, toExpression(e1));
                 }
                 case IF_NULL: {
                     github.alittlehuang.sql4j.dsl.expression.Expression e1 = expressions.get(1);
-                    if (e1 instanceof ConstantExpression cv) {
+                    if (e1 instanceof ConstantExpression) {
+                        ConstantExpression cv = (ConstantExpression) e1;
                         return cb.coalesce(cast(e0), ((Integer) cv.value()));
                     }
                     return cb.coalesce(e0, toExpression(e1));
@@ -267,8 +302,8 @@ public class JpaPredicateBuilder<T> {
         }
     }
 
-    public static <T> jakarta.persistence.criteria.Expression<T>
-    cast(jakarta.persistence.criteria.Expression<?> expression) {
+    public static <T> javax.persistence.criteria.Expression<T>
+    cast(javax.persistence.criteria.Expression<?> expression) {
         return TypeCastUtil.cast(expression);
     }
 
