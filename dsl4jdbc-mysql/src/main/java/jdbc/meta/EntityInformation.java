@@ -1,4 +1,4 @@
-package github.alittlehuang.sql4j.dsl.support.meta;
+package jdbc.meta;
 
 import github.alittlehuang.sql4j.dsl.util.Assert;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
@@ -110,7 +110,7 @@ public class EntityInformation<T> {
         );
     }
 
-    public static <X, Y> EntityInformation<X> getInstance(Class<X> clazz) {
+    public static <X> EntityInformation<X> getInstance(Class<X> clazz) {
         EntityInformation<?> information = MAP.computeIfAbsent(clazz, EntityInformation::new);
         return TypeCastUtil.cast(information);
     }

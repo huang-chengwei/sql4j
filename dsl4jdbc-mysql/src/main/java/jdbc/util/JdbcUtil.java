@@ -1,5 +1,6 @@
 package jdbc.util;
 
+import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
 import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,8 +65,7 @@ public abstract class JdbcUtil {
         } else {
             result = getter.getValue(resultSet, index);
         }
-        //noinspection unchecked
-        return (X) result;
+        return TypeCastUtil.cast(result);
     }
 
 

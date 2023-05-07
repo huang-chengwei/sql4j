@@ -1,22 +1,18 @@
-package github.alittlehuang.sql4j.dsl.support.meta;
+package github.alittlehuang.sql4j.dsl.support.builder.projection.meta.impl;
 
-import lombok.Getter;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionAttribute;
 import lombok.SneakyThrows;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-@Getter
-public class ProjectionAttribute {
+public class DefaultProjectionAttribute implements ProjectionAttribute {
 
-    private final Field field;
     private final Method getter;
     private final Method setter;
     private final String fieldName;
 
-    public ProjectionAttribute(String fieldName, Field field, Method getter, Method setter) {
+    public DefaultProjectionAttribute(String fieldName, Method getter, Method setter) {
         this.fieldName = fieldName;
-        this.field = field;
         this.getter = getter;
         this.setter = setter;
     }
@@ -28,17 +24,13 @@ public class ProjectionAttribute {
         }
     }
 
-    @SneakyThrows
-    public Object getValue(Object target) {
-        return getter.invoke(target);
-    }
-
-    public Class<?> getJavaType() {
-        return getter.getReturnType();
-    }
-
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public Method getGetter() {
+        return getter;
     }
 
 }

@@ -2,18 +2,29 @@ package jdbc.sql;
 
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
-import github.alittlehuang.sql4j.dsl.support.ResultQueryFactory;
-import github.alittlehuang.sql4j.dsl.support.builder.ProjectionResultBuilder;
+import github.alittlehuang.sql4j.dsl.support.ResultBuilderFactory;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMetaProvider;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.ProjectionResultBuilder;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
 
-public class JdbcQueryTypeQueryFactory implements ResultQueryFactory {
+public class JdbcQueryTypeQueryFactory implements ResultBuilderFactory {
     private final PreparedSqlExecutor executor;
     private final SqlBuilderFactory sqlBuilder;
+    private final ProjectionMetaProvider metaProvider;
 
     public JdbcQueryTypeQueryFactory(PreparedSqlExecutor executor,
                                      SqlBuilderFactory sqlBuilder) {
         this.executor = executor;
         this.sqlBuilder = sqlBuilder;
+        metaProvider = null;
+    }
+
+    public JdbcQueryTypeQueryFactory(PreparedSqlExecutor executor,
+                                     SqlBuilderFactory sqlBuilder,
+                                     ProjectionMetaProvider metaProvider) {
+        this.executor = executor;
+        this.sqlBuilder = sqlBuilder;
+        this.metaProvider = metaProvider;
     }
 
     @Override
@@ -22,8 +33,8 @@ public class JdbcQueryTypeQueryFactory implements ResultQueryFactory {
     }
 
     @Override
-    public <T, R> ResultBuilder<R> getProjectionQuery(QuerySpecification criteriaQuery, Class<T> type, Class<R> projectionType) {
-        return new ProjectionResultBuilder<>(this, criteriaQuery, type, projectionType);
+    public <T, R> ResultBuilder<R> getProjectionQuery(QuerySpecification spec, Class<T> type, Class<R> projectionType) {
+        return new ProjectionResultBuilder<>(this, spec, type, projectionType, metaProvider);
     }
 
     @Override

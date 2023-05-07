@@ -3,8 +3,8 @@ package jdbc.mysql;
 
 import github.alittlehuang.sql4j.dsl.expression.*;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
-import github.alittlehuang.sql4j.dsl.support.meta.Attribute;
-import github.alittlehuang.sql4j.dsl.support.meta.EntityInformation;
+import jdbc.meta.Attribute;
+import jdbc.meta.EntityInformation;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.Assert;
 import jakarta.persistence.LockModeType;
@@ -484,7 +484,6 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     }
                     appendExpression(e);
                 }
-
             }
         }
 

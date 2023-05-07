@@ -6,7 +6,7 @@ import github.alittlehuang.sql4j.dsl.expression.PathExpression;
 import github.alittlehuang.sql4j.dsl.expression.SortSpecification;
 import github.alittlehuang.sql4j.dsl.support.Configure;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
-import github.alittlehuang.sql4j.dsl.support.ResultQueryFactory;
+import github.alittlehuang.sql4j.dsl.support.ResultBuilderFactory;
 import github.alittlehuang.sql4j.dsl.support.builder.operator.*;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import org.jetbrains.annotations.NotNull;
@@ -21,12 +21,12 @@ public final class QuerySupport<T> {
 
     private final QuerySpecification spec;
     private final Class<T> type;
-    private final ResultQueryFactory typeQueryFactory;
+    private final ResultBuilderFactory typeQueryFactory;
     private final Configure config;
 
     public QuerySupport(QuerySpecification spec,
                         Class<T> type,
-                        ResultQueryFactory typeQueryFactory,
+                        ResultBuilderFactory typeQueryFactory,
                         Configure config) {
         this.spec = Objects.requireNonNull(spec);
         this.type = Objects.requireNonNull(type);
@@ -34,11 +34,11 @@ public final class QuerySupport<T> {
         this.config = Objects.requireNonNull(config);
     }
 
-    public static <T> @NotNull QuerySupport<T> of(Class<T> type, ResultQueryFactory factory) {
+    public static <T> @NotNull QuerySupport<T> of(Class<T> type, ResultBuilderFactory factory) {
         return of(type, factory, null);
     }
 
-    public static <T> @NotNull QuerySupport<T> of(Class<T> type, ResultQueryFactory factory, Configure config) {
+    public static <T> @NotNull QuerySupport<T> of(Class<T> type, ResultBuilderFactory factory, Configure config) {
         return new QuerySupport<>(QuerySpecification.EMPTY, type, factory, config);
     }
 
@@ -158,7 +158,7 @@ public final class QuerySupport<T> {
         return type;
     }
 
-    public ResultQueryFactory getTypeQueryFactory() {
+    public ResultBuilderFactory getTypeQueryFactory() {
         return typeQueryFactory;
     }
 

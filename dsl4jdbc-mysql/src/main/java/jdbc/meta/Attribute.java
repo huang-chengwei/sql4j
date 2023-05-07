@@ -1,4 +1,4 @@
-package github.alittlehuang.sql4j.dsl.support.meta;
+package jdbc.meta;
 
 import jakarta.persistence.*;
 

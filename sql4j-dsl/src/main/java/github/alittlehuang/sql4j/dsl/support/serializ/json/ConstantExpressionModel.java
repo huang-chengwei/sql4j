@@ -3,7 +3,7 @@ package github.alittlehuang.sql4j.dsl.support.serializ.json;
 import github.alittlehuang.sql4j.dsl.expression.ConstantExpression;
 import github.alittlehuang.sql4j.dsl.expression.Expression;
 import github.alittlehuang.sql4j.dsl.expression.ExpressionSupplier;
-import github.alittlehuang.sql4j.dsl.support.meta.BasicTypes;
+import github.alittlehuang.sql4j.dsl.util.BasicTypes;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
 
 import java.math.BigDecimal;
@@ -20,8 +20,8 @@ public class ConstantExpressionModel implements ExpressionSupplier {
     }
 
     public ConstantExpressionModel(Object value) {
-        int type = BasicTypes.isBasicType(value);
-        if (type < 0) {
+        boolean isBasic = BasicTypes.isBasicType(value);
+        if (!isBasic) {
             throw new IllegalArgumentException();
         }
         this.value = value;

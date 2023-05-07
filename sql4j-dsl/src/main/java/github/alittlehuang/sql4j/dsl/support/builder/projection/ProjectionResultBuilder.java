@@ -1,13 +1,14 @@
-package github.alittlehuang.sql4j.dsl.support.builder;
+package github.alittlehuang.sql4j.dsl.support.builder.projection;
 
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.expression.Expression;
 import github.alittlehuang.sql4j.dsl.expression.PathExpression;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
-import github.alittlehuang.sql4j.dsl.support.ResultQueryFactory;
+import github.alittlehuang.sql4j.dsl.support.ResultBuilderFactory;
 import github.alittlehuang.sql4j.dsl.support.builder.operator.ConstantArray;
-import github.alittlehuang.sql4j.dsl.support.meta.ProjectionAttribute;
-import github.alittlehuang.sql4j.dsl.support.meta.ProjectionInformation;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionAttribute;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMeta;
+import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionMetaProvider;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
@@ -30,29 +31,34 @@ import static java.lang.invoke.MethodHandles.lookup;
 
 public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
 
-    private final ResultQueryFactory typeQueryFactory;
-    private final QuerySpecification criteriaQuery;
+    private final ResultBuilderFactory typeQueryFactory;
+    private final QuerySpecification querySpec;
     private final Class<T> type;
     private final Class<R> projectionType;
+    private final ProjectionMetaProvider projectionInformationProvider;
 
-    public ProjectionResultBuilder(ResultQueryFactory typeQueryFactory,
-                                   QuerySpecification criteriaQuery,
+    public ProjectionResultBuilder(ResultBuilderFactory resultBuilderFactory,
+                                   QuerySpecification querySpec,
                                    Class<T> type,
-                                   Class<R> projectionType) {
-        this.typeQueryFactory = typeQueryFactory;
-        this.criteriaQuery = criteriaQuery;
+                                   Class<R> projectionType,
+                                   ProjectionMetaProvider metaProvider) {
+        this.typeQueryFactory = resultBuilderFactory;
+        this.querySpec = querySpec;
         this.type = type;
         this.projectionType = projectionType;
+        this.projectionInformationProvider = metaProvider == null
+                ? ProjectionMetaProvider.DEFAULT
+                : metaProvider;
     }
 
     @Override
     public int count() {
-        return typeQueryFactory.getEntityResultQuery(criteriaQuery, type).count();
+        return typeQueryFactory.getEntityResultQuery(querySpec, type).count();
     }
 
     @Override
     public List<R> getList(int offset, int maxResult, LockModeType lockModeType) {
-        ProjectionInformation info = ProjectionInformation.get(type, projectionType);
+        var info = projectionInformationProvider.getProjectionAttributes(type, projectionType);
         ArrayList<String> paths = new ArrayList<>();
         for (ProjectionAttribute attribute : info) {
             paths.add(attribute.getFieldName());
@@ -62,7 +68,7 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
                 .collect(Collectors.toList());
         Array<Expression> array = new ConstantArray<>(selections);
 
-        QuerySpecification structuredQuery = criteriaQuery.updateSelect(array);
+        QuerySpecification structuredQuery = querySpec.updateSelect(array);
         List<Tuple> objects = typeQueryFactory.getObjectsTypeQuery(structuredQuery, type)
                 .getList(offset, maxResult, lockModeType);
         return objects.stream()
@@ -71,7 +77,7 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
     }
 
     @SneakyThrows
-    private R mapToRejection(ProjectionInformation info, ArrayList<String> paths, Tuple os, Class<R> projectionType) {
+    private R mapToRejection(ProjectionMeta info, ArrayList<String> paths, Tuple os, Class<R> projectionType) {
         ClassLoader classLoader = projectionType.getClassLoader();
         Class<?>[] interfaces = {projectionType, ProjectionProxyInstance.class};
 
@@ -162,7 +168,7 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
 
     @Override
     public boolean exist(int offset) {
-        return typeQueryFactory.getEntityResultQuery(criteriaQuery, type).exist(offset);
+        return typeQueryFactory.getEntityResultQuery(querySpec, type).exist(offset);
     }
 
     private interface ProjectionProxyInstance {
