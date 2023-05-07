@@ -1,6 +1,7 @@
 package jdbc.sql;
 
-import jakarta.persistence.LockModeType;
+
+import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 
 public interface PreparedSqlBuilder {
 

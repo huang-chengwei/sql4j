@@ -1,7 +1,6 @@
 package github.alittlehuang.sql4j.dsl.builder;
 
 import github.alittlehuang.sql4j.dsl.util.Assert;
-import jakarta.persistence.LockModeType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

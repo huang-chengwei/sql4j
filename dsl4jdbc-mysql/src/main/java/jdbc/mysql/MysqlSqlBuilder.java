@@ -1,13 +1,13 @@
 package jdbc.mysql;
 
 
+import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 import github.alittlehuang.sql4j.dsl.expression.*;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 import jdbc.meta.Attribute;
 import jdbc.meta.EntityInformation;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.Assert;
-import jakarta.persistence.LockModeType;
 import jdbc.sql.PreparedSql;
 import jdbc.sql.PreparedSqlBuilder;
 import jdbc.sql.SelectedPreparedSql;

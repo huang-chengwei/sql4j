@@ -11,15 +11,10 @@
 
     <artifactId>sql4j-dsl</artifactId>
     <dependencies>
+
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -28,6 +23,7 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+
     </dependencies>
 
     <properties>

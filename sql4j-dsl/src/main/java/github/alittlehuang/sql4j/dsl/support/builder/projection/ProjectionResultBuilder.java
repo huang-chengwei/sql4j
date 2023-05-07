@@ -1,5 +1,6 @@
 package github.alittlehuang.sql4j.dsl.support.builder.projection;
 
+import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.expression.Expression;
 import github.alittlehuang.sql4j.dsl.expression.PathExpression;
@@ -12,7 +13,6 @@ import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.ProjectionM
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
-import jakarta.persistence.LockModeType;
 import lombok.SneakyThrows;
 
 import java.lang.invoke.MethodHandles;

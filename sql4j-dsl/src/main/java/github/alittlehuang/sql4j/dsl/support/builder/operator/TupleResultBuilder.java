@@ -1,9 +1,9 @@
 package github.alittlehuang.sql4j.dsl.support.builder.operator;
 
+import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.support.builder.QuerySupport;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
-import jakarta.persistence.LockModeType;
 
 import java.util.List;
 

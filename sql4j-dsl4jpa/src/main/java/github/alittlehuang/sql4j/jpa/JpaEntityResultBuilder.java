@@ -1,9 +1,9 @@
 package github.alittlehuang.sql4j.jpa;
 
+import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class JpaEntityResultBuilder<T> extends JpaResultQuery<T> implements Resu
 
     @Override
     public List<T> getList(int offset, int maxResult, LockModeType lockModeType) {
-        return getResultBuilder().buildList(offset, maxResult, lockModeType);
+        return getResultBuilder().buildList(offset, maxResult, LockModeTypeAdapter.of(lockModeType));
     }
 
     private JpaResultQuery<T>.Builder<T> getResultBuilder() {

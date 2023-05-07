@@ -1,11 +1,11 @@
 package github.alittlehuang.sql4j.jpa;
 
+import github.alittlehuang.sql4j.dsl.builder.LockModeType;
 import github.alittlehuang.sql4j.dsl.builder.ResultBuilder;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 import github.alittlehuang.sql4j.dsl.support.builder.operator.DefaultTuple;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +24,7 @@ public class JpaObjectsResultBuilder<T> extends JpaResultQuery<T> implements Res
             resultBuilder = new Builder<Object[]>(Object[].class);
         }
         return resultBuilder
-                .buildList(offset, maxResult, lockModeType)
+                .buildList(offset, maxResult, LockModeTypeAdapter.of(lockModeType))
                 .stream()
                 .map(DefaultTuple::new)
                 .collect(Collectors.toList());
